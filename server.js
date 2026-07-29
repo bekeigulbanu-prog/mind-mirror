@@ -28,12 +28,42 @@ async function connectToDb() {
         pool = await sql.connect(dbConfig);
         console.log('✅ Успешно подключено к базе данных MindMirrorDB');
     } catch (err) {
-        console.error('❌ Ошибка подключения к БД:', err.message);
-        console.error('Проверь: SQL Server запущен, имя сервера, логин/пароль и firewall.');
+        console.error('❌ Ошибка подкconst express = require('express');
+const sql = require('mssql');
+const cors = require('cors');
+require('dotenv').config(); // npm install dotenv
+
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// ========== Database Configuration ==========
+const dbConfig = {
+    server: process.env.DB_SERVER || 'localhost',
+    database: process.env.DB_NAME || 'MindMirrorDB',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    options: { 
+        encrypt: false, 
+        trustServerCertificate: true,
+        enableArithAbort: true
+    }
+};
+
+let pool;
+
+async function connectToDb() {
+    try {
+        pool = await sql.connect(dbConfig);
+        console.log('✅ Successfully connected to the MindMirrorDB database');
+    } catch (err) {
+        console.error('❌ Database connection error:', err.message);
+        console.error('Check: SQL Server is running, server name, login/password, and firewall.');
     }
 }
 
-// Логирование действий
+// Action Logging
 async function logAction(req, email, action) {
     try {
         if (!email) return;
@@ -49,7 +79,7 @@ async function logAction(req, email, action) {
                     VALUES (@email, @action, @ip, GETDATE())`);
 
     } catch (e) {
-        console.error('Ошибка логирования:', e.message);
+        console.error('Logging error:', e.message);
     }
 }
 
@@ -58,7 +88,7 @@ app.post('/api/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-        return res.status(400).json({ success: false, error: 'Заполните все поля' });
+        return res.status(400).json({ success: false, error: 'Please fill in all fields' });
     }
 
     try {
@@ -67,19 +97,19 @@ app.post('/api/register', async (req, res) => {
             .query('SELECT Id FROM Users WHERE Email = @email');
 
         if (existing.recordset.length > 0) {
-            return res.status(400).json({ success: false, error: 'Этот email уже зарегистрирован' });
+            return res.status(400).json({ success: false, error: 'This email is already registered' });
         }
 
         await pool.request()
             .input('name', sql.NVarChar, name)
             .input('email', sql.NVarChar, email)
-            .input('password', sql.NVarChar, password) // В продакшене используй bcrypt!
+            .input('password', sql.NVarChar, password) // Use bcrypt in production!
             .query(`INSERT INTO Users (Name, Email, Password, CreatedAt) 
                     VALUES (@name, @email, @password, GETDATE())`);
 
         await logAction(req, email, 'Register');
 
-        console.log(`✅ Новый пользователь: ${email}`);
+        console.log(`✅ New user registered: ${email}`);
         res.json({ success: true });
     } catch (err) {
         console.error(err);
@@ -92,11 +122,11 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ success: false, error: 'Введите email и пароль' });
+        return res.status(400).json({ success: false, error: 'Enter email and password' });
     }
 
     try {
-        console.log(`Попытка входа: ${email}`);
+        console.log(`Login attempt: ${email}`);
 
         const result = await pool.request()
             .input('email', sql.NVarChar, email)
@@ -112,7 +142,7 @@ app.post('/api/login', async (req, res) => {
             
             await logAction(req, email, 'Login');
 
-            console.log(`✅ Успешный вход: ${email}`);
+            console.log(`✅ Successful login: ${email}`);
             res.json({ 
                 success: true, 
                 name: user.Name,
@@ -120,11 +150,11 @@ app.post('/api/login', async (req, res) => {
                 createdAt: user.CreatedAt 
             });
         } else {
-            res.status(401).json({ success: false, error: 'Неверный email или пароль' });
+            res.status(401).json({ success: false, error: 'Invalid email or password' });
         }
     } catch (err) {
-        console.error('❌ Ошибка при логине:', err.message);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        console.error('❌ Login error:', err.message);
+        res.status(500).json({ success: false, error: 'Server error' });
     }
 });
 
@@ -133,7 +163,7 @@ app.post('/api/save-result', async (req, res) => {
     const { userEmail, testTitle, totalScore, verdict, mood } = req.body;
 
     if (!userEmail || !testTitle) {
-        return res.status(400).json({ success: false, error: 'Недостаточно данных' });
+        return res.status(400).json({ success: false, error: 'Insufficient data' });
     }
 
     try {
@@ -147,10 +177,10 @@ app.post('/api/save-result', async (req, res) => {
                     (UserEmail, TestTitle, Score, Verdict, Mood, CreatedAt)
                     VALUES (@email, @testTitle, @score, @verdict, @mood, GETDATE())`);
 
-        console.log(`✅ Результат теста сохранён для ${userEmail} | ${testTitle} (${totalScore})`);
+        console.log(`✅ Test result saved for ${userEmail} | ${testTitle} (${totalScore})`);
         res.json({ success: true });
     } catch (err) {
-        console.error('Ошибка сохранения результата:', err.message);
+        console.error('Error saving result:', err.message);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -160,7 +190,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 async function callGemini(prompt) {
     if (!GEMINI_API_KEY) {
-        return "Ошибка: GEMINI_API_KEY не задан в переменных окружения.";
+        return "Error: GEMINI_API_KEY is not set in environment variables.";
     }
 
     try {
@@ -189,8 +219,8 @@ async function callGemini(prompt) {
             const errorText = await response.text().catch(() => '');
             console.error(`Gemini API error ${response.status}:`, errorText);
 
-            if (response.status === 429) throw new Error('Лимит запросов Gemini исчерпан');
-            if (response.status === 503) throw new Error('Gemini временно перегружен');
+            if (response.status === 429) throw new Error('Gemini rate limit exceeded');
+            if (response.status === 503) throw new Error('Gemini is temporarily overloaded');
 
             throw new Error(`Gemini API error: ${response.status}`);
         }
@@ -198,34 +228,34 @@ async function callGemini(prompt) {
         const data = await response.json();
 
         if (!data.candidates || data.candidates.length === 0) {
-            return "Извините, я не смог обработать ваш запрос. Попробуйте перефразировать.";
+            return "Sorry, I was unable to process your request. Please try rephrasing.";
         }
 
-        return data.candidates[0].content?.parts?.[0]?.text?.trim() || "Пустой ответ от ИИ.";
+        return data.candidates[0].content?.parts?.[0]?.text?.trim() || "Empty response from AI.";
     } catch (err) {
-        console.error('❌ Ошибка callGemini:', err.message);
-        return "Прости, я сейчас немного перегружена. Попробуй через минуту ❤️";
+        console.error('❌ callGemini error:', err.message);
+        return "Sorry, I'm a bit overloaded right now. Please try again in a minute ❤️";
     }
 }
 
 app.post('/api/ai-chat', async (req, res) => {
     const { message, mode = 'chat', history = [] } = req.body;
 
-    let systemPrompt = `Ты — MindMirror AI, очень мягкий, эмпатичный и мудрый психологический помощник. 
-Ты помогаешь людям разбираться в своих мыслях и эмоциях. 
-Говори спокойно, поддерживающе, без нравоучений. 
-Всегда отвечай на русском языке.`;
+    let systemPrompt = `You are MindMirror AI, a very gentle, empathetic, and wise psychological assistant. 
+You help people navigate their thoughts and emotions. 
+Speak calmly, supportively, and without preaching. 
+Always respond in English.`;
 
-    if (mode === 'reframe') systemPrompt += `\n\nПользователь хочет переформулировать негативную мысль. Предложи 3 варианта: нейтральный и позитивный.`;
-    else if (mode === 'analyze') systemPrompt += `\n\nРазбери ситуацию пользователя мягко: эмоции, возможные причины, рекомендации.`;
-    else if (mode === 'crisis') systemPrompt += `\n\nЭто кризисный режим. Будь максимально заботливым. При необходимости мягко предложи горячую линию 8-800-2000-122.`;
-    else if (mode === 'diary') systemPrompt += `\n\nПроанализируй запись из дневника: выдели эмоции и дай короткий поддерживающий инсайт.`;
+    if (mode === 'reframe') systemPrompt += `\n\nThe user wants to reframe a negative thought. Offer 3 options: neutral and positive ones.`;
+    else if (mode === 'analyze') systemPrompt += `\n\nAnalyze the user's situation gently: emotions, possible causes, and recommendations.`;
+    else if (mode === 'crisis') systemPrompt += `\n\nThis is crisis mode. Be as caring as possible. If necessary, gently suggest a helpline.`;
+    else if (mode === 'diary') systemPrompt += `\n\nAnalyze the diary entry: identify emotions and provide a brief supportive insight.`;
 
-    let fullPrompt = systemPrompt + '\n\nИстория разговора:\n';
+    let fullPrompt = systemPrompt + '\n\nConversation history:\n';
     history.forEach(msg => {
-        fullPrompt += `${msg.role === 'user' ? 'Пользователь' : 'MindMirror'}: ${msg.content}\n`;
+        fullPrompt += `${msg.role === 'user' ? 'User' : 'MindMirror'}: ${msg.content}\n`;
     });
-    fullPrompt += `Пользователь: ${message}`;
+    fullPrompt += `User: ${message}`;
 
     try {
         const aiResponse = await callGemini(fullPrompt);
@@ -233,7 +263,7 @@ app.post('/api/ai-chat', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ 
-            response: 'Прости, я сейчас немного перегружена. Попробуй через минуту ❤️' 
+            response: "Sorry, I'm a bit overloaded right now. Please try again in a minute ❤️" 
         });
     }
 });
@@ -246,21 +276,21 @@ const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@example.com';
 
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
-// ==================== МАРШРУТ ПОДДЕРЖКИ ====================
+// ==================== SUPPORT ROUTE ====================
 app.post('/api/contact', async (req, res) => {
     const { name, email, subject, message } = req.body;
 
     if (!name || !email || !subject || !message) {
         return res.status(400).json({ 
             success: false, 
-            error: 'Все поля обязательны' 
+            error: 'All fields are required' 
         });
     }
 
     if (!resend) {
         return res.status(500).json({ 
             success: false, 
-            error: 'Почтовый сервис не настроен (RESEND_API_KEY отсутствует)' 
+            error: 'Email service is not configured (RESEND_API_KEY is missing)' 
         });
     }
 
@@ -269,36 +299,36 @@ app.post('/api/contact', async (req, res) => {
             from: 'MindMirror Support <onboarding@resend.dev>',
             replyTo: email,
             to: SUPPORT_EMAIL,
-            subject: `MindMirror Поддержка: ${subject} — от ${name}`,
-            text: `Имя: ${name}\nEmail для ответа: ${email}\nТема: ${subject}\n\nСообщение:\n${message}`,
+            subject: `MindMirror Support: ${subject} — from ${name}`,
+            text: `Name: ${name}\nReply-To Email: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background:#f9fafb;">
-                    <h2 style="color: #6366f1;">Новое сообщение в поддержку MindMirror</h2>
-                    <p><strong>От:</strong> ${name} (${email})</p>
-                    <p><strong>Тема:</strong> ${subject}</p>
+                    <h2 style="color: #6366f1;">New message to MindMirror support</h2>
+                    <p><strong>From:</strong> ${name} (${email})</p>
+                    <p><strong>Subject:</strong> ${subject}</p>
                     <hr style="border: 1px solid #e5e7eb; margin: 20px 0;">
                     <div style="background:white; padding:15px; border-radius:8px; white-space: pre-wrap; line-height: 1.6;">
                         ${message.replace(/\n/g, '<br>')}
                     </div>
                     <br>
-                    <small style="color: #6b7280;">Отправлено: ${new Date().toLocaleString('ru-RU')}</small>
+                    <small style="color: #6b7280;">Sent: ${new Date().toLocaleString('en-US')}</small>
                 </div>
             `
         });
 
-        console.log(`✅ Письмо в поддержку отправлено на ${SUPPORT_EMAIL}`);
+        console.log(`✅ Support email sent to ${SUPPORT_EMAIL}`);
 
         await logAction(req, email, `Contact: ${subject}`);
 
         res.json({ 
             success: true, 
-            message: 'Сообщение успешно отправлено! Спасибо, мы скоро свяжемся ❤️' 
+            message: 'Message sent successfully! Thank you, we will contact you soon ❤️' 
         });
     } catch (err) {
-        console.error('❌ Ошибка Resend:', err.message || err);
+        console.error('❌ Resend error:', err.message || err);
         res.status(500).json({ 
             success: false, 
-            error: 'Не удалось отправить сообщение. Попробуйте позже.' 
+            error: 'Failed to send message. Please try again later.' 
         });
     }
 });
@@ -308,7 +338,7 @@ app.put('/api/profile', async (req, res) => {
     const { email, name, avatar } = req.body;
 
     if (!email) {
-        return res.status(400).json({ success: false, error: 'Email обязателен' });
+        return res.status(400).json({ success: false, error: 'Email is required' });
     }
 
     try {
@@ -328,7 +358,7 @@ app.put('/api/profile', async (req, res) => {
         }
 
         if (!hasUpdate) {
-            return res.status(400).json({ success: false, error: 'Нет данных для обновления' });
+            return res.status(400).json({ success: false, error: 'No data to update' });
         }
 
         query = query.replace(/,\s*$/, ` WHERE Email = @email`);
@@ -337,14 +367,14 @@ app.put('/api/profile', async (req, res) => {
 
         await logAction(req, email, 'Profile Update');
 
-        res.json({ success: true, message: 'Профиль успешно обновлён ✅' });
+        res.json({ success: true, message: 'Profile updated successfully ✅' });
     } catch (err) {
-        console.error('Ошибка обновления профиля:', err.message);
+        console.error('Profile update error:', err.message);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// === СБОР ОТЗЫВОВ ===
+// === FEEDBACK COLLECTION ===
 
 app.get('/api/feedback', async (req, res) => {
     try {
@@ -364,7 +394,7 @@ app.post('/api/feedback', async (req, res) => {
     const { userEmail, rating, comment } = req.body;
 
     if (!userEmail || !rating || rating < 1 || rating > 5) {
-        return res.status(400).json({ success: false, error: 'Некорректные данные' });
+        return res.status(400).json({ success: false, error: 'Invalid data' });
     }
 
     try {
@@ -375,14 +405,14 @@ app.post('/api/feedback', async (req, res) => {
             .query(`INSERT INTO Feedback (UserEmail, Rating, Comment)
                     VALUES (@email, @rating, @comment)`);
 
-        res.json({ success: true, message: 'Спасибо за ваш отзыв ❤️' });
+        res.json({ success: true, message: 'Thank you for your feedback ❤️' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// === АНАЛИЗ ОТЗЫВОВ ===
+// === FEEDBACK ANALYSIS ===
 app.post('/api/analyze-feedback', async (req, res) => {
     try {
         const result = await pool.request()
@@ -396,26 +426,26 @@ app.post('/api/analyze-feedback', async (req, res) => {
         if (feedbacks.length === 0) {
             return res.json({ 
                 success: true, 
-                analysis: "За последний месяц отзывов ещё нет.",
+                analysis: "No reviews found for the past month.",
                 totalReviews: 0,
                 averageRating: 0
             });
         }
 
-        let promptText = `Проанализируй отзывы пользователей приложения MindMirror за последний месяц.\n\n`;
-        promptText += `Всего отзывов: ${feedbacks.length}\nСредний рейтинг: ${(feedbacks.reduce((sum, f) => sum + (f.Rating || 0), 0) / feedbacks.length).toFixed(1)}\n\n`;
+        let promptText = `Analyze user feedback for the MindMirror app over the past month.\n\n`;
+        promptText += `Total reviews: ${feedbacks.length}\nAverage rating: ${(feedbacks.reduce((sum, f) => sum + (f.Rating || 0), 0) / feedbacks.length).toFixed(1)}\n\n`;
 
         feedbacks.forEach((f, i) => {
-            promptText += `Отзыв ${i+1}: Рейтинг ${f.Rating}/5 — "${f.Comment || 'Без комментария'}"\n`;
+            promptText += `Review ${i+1}: Rating ${f.Rating}/5 — "${f.Comment || 'No comment'}"\n`;
         });
 
-        promptText += `\nДай подробный анализ на русском языке в следующем формате:\n
-1. Общая оценка и тон отзывов.
-2. Главные плюсы приложения.
-3. Главные проблемы и что нужно улучшить.
-4. Самые частые пожелания пользователей.
-5. Ключевые цитаты (3–5 штук).
-6. Конкретные рекомендации для разработчика.`;
+        promptText += `\nProvide a detailed analysis in English in the following format:\n
+1. Overall tone and sentiment of the feedback.
+2. Main pros of the app.
+3. Main issues and areas for improvement.
+4. Most common user feature requests.
+5. Key quotes (3–5 quotes).
+6. Actionable recommendations for the developer.`;
 
         const aiResponse = await callGemini(promptText);
 
@@ -427,20 +457,20 @@ app.post('/api/analyze-feedback', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Ошибка анализа отзывов:', err.message);
+        console.error('Feedback analysis error:', err.message);
         res.status(500).json({ 
             success: false, 
-            error: 'Не удалось выполнить анализ. Попробуйте позже.' 
+            error: 'Failed to perform analysis. Please try again later.' 
         });
     }
 });
 
-// ====================== КОНСУЛЬТАЦИЯ С ПСИХОЛОГОМ ======================
+// ====================== PSYCHOLOGIST CONSULTATION ======================
 app.post('/api/book-consultation', async (req, res) => {
     const { userEmail, topic, preferredDate, notes } = req.body;
 
     if (!userEmail || !topic || !preferredDate) {
-        return res.status(400).json({ success: false, error: 'Заполните все обязательные поля' });
+        return res.status(400).json({ success: false, error: 'Please fill in all required fields' });
     }
 
     try {
@@ -459,15 +489,15 @@ app.post('/api/book-consultation', async (req, res) => {
                 from: 'MindMirror Support <onboarding@resend.dev>',
                 replyTo: userEmail,
                 to: [SUPPORT_EMAIL],
-                subject: `НОВАЯ ЗАПИСЬ НА КОНСУЛЬТАЦИЮ — ${topic}`,
+                subject: `NEW CONSULTATION BOOKING — ${topic}`,
                 html: `
-                    <h2>Новая запись на консультацию</h2>
-                    <p><strong>Пользователь:</strong> ${userEmail}</p>
-                    <p><strong>Тема:</strong> ${topic}</p>
-                    <p><strong>Желаемое время:</strong> ${new Date(preferredDate).toLocaleString('ru-RU')}</p>
-                    ${notes ? `<p><strong>Комментарий:</strong><br>${notes.replace(/\n/g, '<br>')}</p>` : ''}
+                    <h2>New Consultation Booking</h2>
+                    <p><strong>User:</strong> ${userEmail}</p>
+                    <p><strong>Topic:</strong> ${topic}</p>
+                    <p><strong>Preferred Time:</strong> ${new Date(preferredDate).toLocaleString('en-US')}</p>
+                    ${notes ? `<p><strong>Notes:</strong><br>${notes.replace(/\n/g, '<br>')}</p>` : ''}
                     <hr>
-                    <small>Статус: ожидает подтверждения</small>
+                    <small>Status: Pending confirmation</small>
                 `
             });
         }
@@ -476,21 +506,21 @@ app.post('/api/book-consultation', async (req, res) => {
 
         res.json({ 
             success: true, 
-            message: 'Заявка на консультацию успешно отправлена! Психолог свяжется с вами в ближайшее время ❤️' 
+            message: 'Consultation request sent successfully! A psychologist will reach out to you shortly ❤️' 
         });
 
     } catch (err) {
-        console.error('Ошибка записи на консультацию:', err);
-        res.status(500).json({ success: false, error: 'Не удалось записаться' });
+        console.error('Consultation booking error:', err);
+        res.status(500).json({ success: false, error: 'Failed to book consultation' });
     }
 });
 
-// ====================== ИСТОРИЯ КОНСУЛЬТАЦИЙ ======================
+// ====================== CONSULTATION HISTORY ======================
 app.get('/api/consultations', async (req, res) => {
     const { email } = req.query;
 
     if (!email) {
-        return res.status(400).json({ success: false, error: 'Email обязателен' });
+        return res.status(400).json({ success: false, error: 'Email is required' });
     }
 
     try {
@@ -508,17 +538,17 @@ app.get('/api/consultations', async (req, res) => {
             consultations: result.recordset
         });
     } catch (err) {
-        console.error('Ошибка получения истории консультаций:', err.message);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        console.error('Error getting consultation history:', err.message);
+        res.status(500).json({ success: false, error: 'Server error' });
     }
 });
 
-// ====================== ОТМЕНА КОНСУЛЬТАЦИИ ======================
+// ====================== CANCEL CONSULTATION ======================
 app.post('/api/cancel-consultation', async (req, res) => {
     const { id, userEmail } = req.body;
 
     if (!id || !userEmail) {
-        return res.status(400).json({ success: false, error: 'Недостаточно данных' });
+        return res.status(400).json({ success: false, error: 'Insufficient data' });
     }
 
     try {
@@ -528,11 +558,11 @@ app.post('/api/cancel-consultation', async (req, res) => {
             .query(`SELECT Id, Status FROM Consultations WHERE Id = @id AND UserEmail = @email`);
 
         if (check.recordset.length === 0) {
-            return res.status(404).json({ success: false, error: 'Консультация не найдена' });
+            return res.status(404).json({ success: false, error: 'Consultation not found' });
         }
 
         if (check.recordset[0].Status?.toLowerCase() === 'cancelled') {
-            return res.status(400).json({ success: false, error: 'Консультация уже отменена' });
+            return res.status(400).json({ success: false, error: 'Consultation is already cancelled' });
         }
 
         await pool.request()
@@ -541,18 +571,18 @@ app.post('/api/cancel-consultation', async (req, res) => {
 
         await logAction(req, userEmail, `Cancelled consultation #${id}`);
 
-        res.json({ success: true, message: 'Консультация успешно отменена' });
+        res.json({ success: true, message: 'Consultation successfully cancelled' });
     } catch (err) {
-        console.error('Ошибка отмены консультации:', err.message);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        console.error('Error cancelling consultation:', err.message);
+        res.status(500).json({ success: false, error: 'Server error' });
     }
 });
 
-// ====================== PREMIUM ПОДПИСКА ======================
+// ====================== PREMIUM SUBSCRIPTION ======================
 
 app.get('/api/subscription/status', async (req, res) => {
     const { email } = req.query;
-    if (!email) return res.status(400).json({ success: false, error: 'Email обязателен' });
+    if (!email) return res.status(400).json({ success: false, error: 'Email is required' });
 
     try {
         const result = await pool.request()
@@ -574,14 +604,14 @@ app.get('/api/subscription/status', async (req, res) => {
         });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Ошибка базы данных' });
+        res.status(500).json({ success: false, error: 'Database error' });
     }
 });
 
 app.post('/api/subscribe', async (req, res) => {
     const { email, plan = 'monthly', amount = 990, cardLast4 = '4242' } = req.body;
 
-    if (!email) return res.status(400).json({ success: false, error: 'Email обязателен' });
+    if (!email) return res.status(400).json({ success: false, error: 'Email is required' });
 
     try {
         const endDate = new Date();
@@ -609,22 +639,22 @@ app.post('/api/subscribe', async (req, res) => {
                 VALUES (@email, @plan, @amount, @card, @endDate, 'active')
             `);
 
-        console.log(`💎 Premium активирован для ${email} до ${endDate.toLocaleDateString('ru-RU')}`);
+        console.log(`💎 Premium activated for ${email} until ${endDate.toLocaleDateString('en-US')}`);
 
         res.json({ 
             success: true, 
-            message: 'Premium успешно активирован!',
+            message: 'Premium successfully activated!',
             until: endDate
         });
     } catch (err) {
         console.error('Subscribe error:', err.message);
-        res.status(500).json({ success: false, error: 'Ошибка при оформлении подписки' });
+        res.status(500).json({ success: false, error: 'Error processing subscription' });
     }
 });
 
 app.post('/api/subscription/cancel', async (req, res) => {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ success: false, error: 'Email обязателен' });
+    if (!email) return res.status(400).json({ success: false, error: 'Email is required' });
 
     try {
         await pool.request()
@@ -643,15 +673,15 @@ app.post('/api/subscription/cancel', async (req, res) => {
                 WHERE UserEmail = @email AND Status = 'active'
             `);
 
-        console.log(`❌ Подписка отменена для ${email}`);
+        console.log(`❌ Subscription cancelled for ${email}`);
 
         res.json({ 
             success: true, 
-            message: 'Подписка отменена' 
+            message: 'Subscription cancelled' 
         });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Ошибка при отмене подписки' });
+        res.status(500).json({ success: false, error: 'Error cancelling subscription' });
     }
 });
 
@@ -692,7 +722,7 @@ app.get('/api/subscriptions/recent', async (req, res) => {
     }
 });
 
-// Запуск сервера
+// Start Server
 connectToDb().then(() => {
     
     app.get('/', (req, res) => {
@@ -702,7 +732,7 @@ connectToDb().then(() => {
     const PORT = process.env.PORT || 3000;
 
     app.listen(PORT, '0.0.0.0', () => {
-        console.log('🚀 Сервер успешно запущен!');
-        console.log(`🌐 Локально: http://localhost:${PORT}`);
+        console.log('🚀 Server successfully started!');
+        console.log(`🌐 Local: http://localhost:${PORT}`);
     });
 });
