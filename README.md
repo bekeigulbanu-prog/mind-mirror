@@ -1,35 +1,34 @@
 # 🪞 MindMirror
 
-**MindMirror** — веб-приложение для психологического самотестирования: пользователь проходит тест, получает результат («заглядывает внутрь себя»), может обратиться за консультацией, оставить отзыв и оформить Premium-подписку. В комплекте — административная панель аналитики с ИИ-анализом отзывов и статистикой посещений.
-
-Исходный код продаётся «как есть» (see `LICENSE.txt`). Ниже — всё, что нужно, чтобы развернуть проект у себя.
+**MindMirror** is a psychological self-testing web application where users take a test, receive their results ("mirroring their inner self"), request a consultation, leave a review, and subscribe to Premium. It includes an administrative analytics dashboard featuring AI-powered review analysis and traffic statistics.
+The source code is sold "as is" (see LICENSE.txt). Below is everything you need to deploy the project on your end.
 
 ---
 
-## Состав проекта
+## Project Structure
 
-| Файл | Назначение |
+| File | Description |
 |---|---|
-| `mindmirror.html` | Клиентское приложение (тест, результаты, кабинет, подписка) |
-| `feedback-analytics.html` | Админ-панель: отзывы, статистика подписок и посещений, ИИ-анализ |
-| `server.js` | Основной API-сервер: регистрация/логин, тесты, профиль, отзывы, консультации, подписки |
-| `analyze-server.js` | Отдельный сервер: ИИ-анализ отзывов пользователей (Google Gemini) |
-| `stats-server.js` | Отдельный сервер: статистика посещений/логинов |
-| `MindMirror.sql` | Служебные SQL-запросы для работы с БД (просмотр таблиц, очистка) |
-| `package.json` | Зависимости и скрипт запуска |
-| `.env.example` | Шаблон переменных окружения |
+| `mindmirror.html` | Client application (test, results, personal dashboard, subscription) |
+| `feedback-analytics.html` | Admin dashboard: reviews, subscription & traffic analytics, AI analysis |
+| `server.js` | Main API server: registration/login, tests, profile, reviews, consultations, subscriptions |
+| `analyze-server.js` | Separate server: AI-powered review analysis (Google Gemini) |
+| `stats-server.js` | Separate server: visit/login statistics |
+| `MindMirror.sql` | Utility SQL queries for database management (viewing tables, cleanup) |
+| `package.json` | Dependencies and startup script|
+| `.env.example` | Environment variables template |
 
-## Технологии
+## Tech Stack
 
 - **Backend:** Node.js, Express 5
-- **База данных:** Microsoft SQL Server (`mssql`)
-- **ИИ:** Google Gemini 2.5 Flash (анализ отзывов и чат)
-- **Почта:** Resend API
+- **Database:** Microsoft SQL Server (`mssql`)
+- **AI:** Google Gemini 2.5 Flash (анализ отзывов и чат)
+- **Email:** Resend API
 - **Frontend:** статический HTML + Tailwind CSS (CDN) + Chart.js, без сборки
 
-## Архитектура
+## Architecture
 
-Проект состоит из трёх независимых Node.js-серверов, работающих на разных портах и использующих одну и ту же базу данных:
+The project consists of three independent Node.js servers operating on separate ports and sharing the same database:
 
 ```
                 ┌───────────────────┐
@@ -39,28 +38,27 @@
         │                 │                 │
 ┌───────┴───────┐ ┌───────┴────────┐ ┌───────┴────────┐
 │  server.js     │ │ analyze-server │ │ stats-server.js │
-│  порт 3000     │ │ порт 3001      │ │ порт 3002       │
-│  основной API  │ │ ИИ-анализ      │ │ статистика      │
+│  Port 3000     │ │ Port 3001      │ │ Port 3002       │
+│  Main API      │ │ AI Analysis    │ │ Statistics      │
 └────────────────┘ └────────────────┘ └─────────────────┘
 ```
 
-`mindmirror.html` обращается к серверу на порту 3000, `feedback-analytics.html` — ко всем трём (3000/3001/3002). При деплое на прод замените `http://localhost:PORT` в HTML-файлах на реальные адреса ваших серверов (или настройте reverse proxy/единый домен).
+`mindmirror.html` interacts with the server on port 3000, while `feedback-analytics.html` accesses all three (3000/3001/3002). When deploying to production, replace `http://localhost:PORT` in the HTML files with your actual server addresses (or set up a reverse proxy / unified domain).
 
-## Требования
+## Requirements
 
 - Node.js 18+
-- Microsoft SQL Server (локально или в облаке)
-- API-ключ Google Gemini (для ИИ-функций)
-- API-ключ Resend (для писем; опционально, если email не нужен)
+- Microsoft SQL Server (local or cloud-hosted)
+- Google Gemini API key (for AI features)
+- Resend API key (for emails; optional if email support is not needed)
 
-## Установка
+## Installation
 
-1. Установите зависимости:
+1. Install dependencies:
    ```bash
    npm install
-   ```
 
-2. Создайте базу данных `MindMirrorDB` в MSSQL со следующими таблицами (структура выводится через SQL из `MindMirror.sql`, создайте их под свою бизнес-логику или запросите готовую DDL-схему у продавца при покупке):
+2. Create the MindMirrorDB database in MSSQL with the following tables (the structure can be derived from the SQL queries in MindMirror.sql; build them according to your business logic or request a pre-built DDL schema from the seller upon purchase):
    - `Users`
    - `UserLogins`
    - `TestResults`
@@ -68,63 +66,56 @@
    - `Consultations`
    - `Subscriptions`
 
-3. Скопируйте `.env.example` в `.env` и заполните значения (данные для подключения к БД, ключи Gemini/Resend, порты).
+3. Copy .env.example to .env and fill in the values (database connection credentials, Gemini/Resend keys, ports):
    ```bash
    cp .env.example .env
    ```
 
-4. Запустите серверы (в отдельных терминалах или через process-manager типа `pm2`):
+4. Start the servers (in separate terminal windows or using a process manager like pm2):
    ```bash
-   node server.js            # основной API — порт 3000
-   node analyze-server.js    # ИИ-анализ отзывов — порт 3001
-   node stats-server.js      # статистика посещений — порт 3002
+   node server.js            # Main API — port 3000
+   node analyze-server.js    # AI review analysis — port 3001
+   node stats-server.js      # Traffic/visit statistics — port 3002
    ```
 
-5. Откройте `mindmirror.html` в браузере (или раздайте статикой через nginx/Express `static`) — это основное приложение.
-   Откройте `feedback-analytics.html` для доступа к админ-панели.
+5. Open mindmirror.html in your browser (or serve it as static files via Nginx or Express static) — this is the main application.
+Open feedback-analytics.html to access the admin dashboard.
 
-> В `package.json` скрипт `npm start` поднимает только основной сервер (`server.js`). Для полного функционала (ИИ-анализ и статистика посещений) запустите также `analyze-server.js` и `stats-server.js`.
+The npm start script in package.json only runs the main server (server.js). For full functionality (AI analysis and traffic statistics), make sure to also run analyze-server.js and stats-server.js.
 
-## Основные API-эндпоинты (server.js, порт 3000)
+## Main API Endpoints (server.js, port 3000)
 
-| Метод | Путь | Назначение |
-|---|---|---|
-| POST | `/api/register` | Регистрация пользователя |
-| POST | `/api/login` | Вход |
-| PUT | `/api/profile` | Обновление профиля |
-| POST | `/api/save-result` | Сохранение результата теста |
-| POST | `/api/ai-chat` | Чат с ИИ |
-| POST | `/api/contact` | Обратная связь / email |
-| GET/POST | `/api/feedback` | Получение / отправка отзывов |
-| POST | `/api/book-consultation` | Запись на консультацию |
-| GET | `/api/consultations` | Список консультаций |
-| POST | `/api/cancel-consultation` | Отмена консультации |
-| GET | `/api/subscription/status` | Статус подписки пользователя |
-| POST | `/api/subscribe` | Оформление подписки |
-| POST | `/api/subscription/cancel` | Отмена подписки |
-| GET | `/api/subscriptions/stats` | Сводная статистика подписок |
-| GET | `/api/subscriptions/recent` | Последние подписки |
+Method,Path,Description
+POST,/api/register,User registration
+POST,/api/login,User login
+PUT,/api/profile,Update profile
+POST,/api/save-result,Save test result
+POST,/api/ai-chat,AI chat
+POST,/api/contact,Contact form / email
+GET/POST,/api/feedback,Fetch / Submit reviews
+POST,/api/book-consultation,Book a consultation
+GET,/api/consultations,List consultations
+POST,/api/cancel-consultation,Cancel consultation
+GET,/api/subscription/status,User subscription status
+POST,/api/subscribe,Subscribe
+POST,/api/subscription/cancel,Cancel subscription
+GET,/api/subscriptions/stats,Summary subscription statistics
+GET,/api/subscriptions/recent,Recent subscriptions
 
-Дополнительно:
-- `POST /api/analyze-feedback` (analyze-server.js, порт 3001) — ИИ-анализ отзывов за последний месяц.
-- `GET /api/stats/visits` (stats-server.js, порт 3002) — статистика посещений/логинов по периодам.
+Additional endpoints:
+POST /api/analyze-feedback (analyze-server.js, port 3001) — AI analysis of reviews for the past month.
+GET /api/stats/visits (stats-server.js, port 3002) — Visit/login statistics by time period.
 
-## Настройка под свой продукт
+## Customization & Setup
+Replace http://localhost:3000/3001/3002 addresses in mindmirror.html and feedback-analytics.html with your production URLs.
+Replace GEMINI_API_KEY and RESEND_API_KEY with your own credentials.
+If necessary, update the CORS policy (app.use(cors())) to an explicit domain whitelist before deploying to the public web.
+User passwords and hashing logic — inspect server.js (/api/register, /api/login) and align them with your security standards before production use.
 
-- Замените адреса `http://localhost:3000/3001/3002` в `mindmirror.html` и `feedback-analytics.html` на боевые адреса.
-- Смените ключи `GEMINI_API_KEY` и `RESEND_API_KEY` на свои.
-- При необходимости смените CORS-политику (`app.use(cors())`) на белый список доменов перед публикацией в интернет.
-- Пароли пользователей и логика хеширования — проверьте `server.js` (`/api/register`, `/api/login`) и приведите к нужным вам стандартам безопасности перед продакшн-использованием.
-
-## Безопасность (важно перед продакшн-запуском)
-
-Это шаблон/исходник, готовый к доработке. Перед публичным запуском рекомендуется:
-- Убедиться, что пароли хранятся в виде хэшей (bcrypt/argon2), а не в открытом виде.
-- Ограничить CORS конкретными доменами.
-- Вынести реальные ключи из кода/репозитория в переменные окружения (`.env`, не коммитить).
-- Добавить rate-limiting на публичные эндпоинты (`/api/login`, `/api/register`).
-- Настроить HTTPS перед продакшн-деплоем.
-
-## Лицензия
-
-См. `LICENSE.txt`.
+## Security Considerations (Important for Production Deployment)
+This is a starter template / source code framework ready for further development. Before launching publicly, it is recommended to:
+Ensure passwords are stored using strong hashing algorithms (e.g., bcrypt/argon2) rather than plaintext.
+Restrict CORS origin policies to specific trusted domains.
+Move real API keys out of the code/repository into environment variables (.env, do not commit).
+Add rate-limiting to public endpoints (/api/login, /api/register).
+Configure HTTPS before deploying to production.
