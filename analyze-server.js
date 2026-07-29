@@ -1,4 +1,4 @@
-// ====================== ANALYZE SERVER - Отдельный сервер для анализа отзывов ======================
+// ====================== ANALYZE SERVER - Separate Server for Review Analysis ======================
 const express = require('express');
 const sql = require('mssql');
 const cors = require('cors');
@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// ========== База данных ==========
+// ========== Database ==========
 const dbConfig = {
     server: process.env.DB_SERVER || 'localhost',
     database: process.env.DB_NAME || 'MindMirrorDB',
@@ -26,9 +26,9 @@ let pool;
 async function connectToDb() {
     try {
         pool = await sql.connect(dbConfig);
-        console.log('✅ Анализ-сервер подключён к БД');
+        console.log('✅ Analysis server connected to the database');
     } catch (err) {
-        console.error('❌ Ошибка подключения к БД:', err.message);
+        console.error('❌ DB connection error:', err.message);
     }
 }
 
@@ -37,7 +37,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 async function callGeminiAnalyze(prompt) {
     if (!GEMINI_API_KEY) {
-        return "Ошибка: GEMINI_API_KEY не задан в переменных окружения.";
+        return "Error: GEMINI_API_KEY is not set in environment variables.";
     }
 
     try {
@@ -67,34 +67,34 @@ async function callGeminiAnalyze(prompt) {
             console.error(`[Analyze] Gemini HTTP ${response.status}:`, errorText);
 
             if (response.status === 503) {
-                return "Модель Gemini сейчас сильно загружена. Попробуйте через 10–30 минут.";
+                return "The Gemini model is currently overloaded. Please try again in 10–30 minutes.";
             }
             if (response.status === 429) {
-                return "Лимит запросов исчерпан на сегодня. Попробуйте завтра или создайте новый API-ключ.";
+                return "Request limit reached for today. Please try again tomorrow or create a new API key.";
             }
             if (response.status === 400 || response.status === 403) {
-                return "Ошибка API-ключа. Создайте новый ключ в Google AI Studio.";
+                return "API key error. Create a new key in Google AI Studio.";
             }
 
-            return `Ошибка Gemini (${response.status}). Попробуйте позже.`;
+            return `Gemini error (${response.status}). Please try again later.`;
         }
 
         const data = await response.json();
 
         if (!data.candidates || data.candidates.length === 0) {
-            return "Gemini не смог обработать запрос (возможно, сработал фильтр безопасности).";
+            return "Gemini could not process the request (a safety filter may have been triggered).";
         }
 
         const candidate = data.candidates[0];
-        return candidate.content?.parts?.[0]?.text || "Пустой ответ от ИИ.";
+        return candidate.content?.parts?.[0]?.text || "Empty response from AI.";
 
     } catch (err) {
-        console.error('❌ Ошибка callGeminiAnalyze:', err.message);
-        return "Ошибка соединения с Gemini. Проверьте интернет и API-ключ.";
+        console.error('❌ callGeminiAnalyze error:', err.message);
+        return "Connection error with Gemini. Check your internet connection and API key.";
     }
 }
 
-// ========== МАРШРУТ АНАЛИЗА ОТЗЫВОВ ==========
+// ========== REVIEW ANALYSIS ROUTE ==========
 app.post('/api/analyze-feedback', async (req, res) => {
     try {
         const result = await pool.request()
@@ -110,37 +110,37 @@ app.post('/api/analyze-feedback', async (req, res) => {
         if (feedbacks.length === 0) {
             return res.json({ 
                 success: true, 
-                analysis: "За последний месяц отзывов пока нет.",
+                analysis: "There are no reviews for the past month yet.",
                 totalReviews: 0,
                 averageRating: 0
             });
         }
 
-        let promptText = `Ты — опытный продуктовый аналитик приложения MindMirror.
+        let promptText = `You are an experienced product analyst for the MindMirror application.
 
-Проанализируй отзывы пользователей за последний месяц максимально честно и подробно.
+Analyze user reviews for the past month as honestly and thoroughly as possible.
 
-Всего отзывов: ${feedbacks.length}
-Средний рейтинг: ${(feedbacks.reduce((sum, f) => sum + (f.Rating || 0), 0) / feedbacks.length).toFixed(1)}
+Total reviews: ${feedbacks.length}
+Average rating: ${(feedbacks.reduce((sum, f) => sum + (f.Rating || 0), 0) / feedbacks.length).toFixed(1)}
 
-Отзывы:\n`;
+Reviews:\n`;
 
         feedbacks.forEach((f, i) => {
-            promptText += `\n${i+1}. ⭐ ${f.Rating}/5 — "${f.Comment || 'Без комментария'}"`;
+            promptText += `\n${i+1}. ⭐ ${f.Rating}/5 — "${f.Comment || 'No comment'}"`;
         });
 
         promptText += `
 
-Дай структурированный анализ на русском языке:
+Provide a structured analysis in English:
 
-1. Общая оценка и тон отзывов
-2. Главные сильные стороны приложения
-3. Главные проблемы и боли пользователей
-4. Самые частые пожелания и предложения
-5. 5–7 ключевых цитат из отзывов (с указанием рейтинга)
-6. Конкретные рекомендации разработчику (что сделать в первую очередь)
+1. Overall assessment and tone of the reviews
+2. Main strengths of the application
+3. Main user issues and pain points
+4. Most frequent feature requests and suggestions
+5. 5–7 key quotes from reviews (including the rating)
+6. Concrete recommendations for the developer (priority actions)
 
-Будь объективным и конструктивным.`;
+Be objective and constructive.`;
 
         const aiResponse = await callGeminiAnalyze(promptText);
 
@@ -152,20 +152,20 @@ app.post('/api/analyze-feedback', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Ошибка анализа отзывов:', err.message);
+        console.error('Review analysis error:', err.message);
         res.status(500).json({ 
             success: false, 
-            error: 'Не удалось выполнить анализ. Смотри логи сервера.' 
+            error: 'Failed to perform analysis. See server logs.' 
         });
     }
 });
 
-// ========== ЗАПУСК СЕРВЕРА ==========
+// ========== SERVER LAUNCH ==========
 connectToDb().then(() => {
     const PORT = process.env.ANALYZE_PORT || 3001;
 
     app.listen(PORT, '0.0.0.0', () => {
-        console.log(`🚀 Анализ-сервер запущен на http://localhost:${PORT}`);
-        console.log(`Модель: Gemini 2.5 Flash`);
+        console.log(`🚀 Analysis server running at http://localhost:${PORT}`);
+        console.log(`Model: Gemini 2.5 Flash`);
     });
 });
