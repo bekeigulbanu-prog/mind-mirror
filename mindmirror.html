@@ -1,0 +1,2962 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindMirror — Загляни внутрь себя</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;min-height:100vh;background:linear-gradient(135deg,#ede9fe,#dbeafe,#f3e8ff);color:#1e1b4b}
+h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif}
+.glass{background:rgba(255,255,255,0.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.4);border-radius:1rem;box-shadow:0 8px 32px rgba(99,102,241,0.12)}
+.glass:hover{box-shadow:0 12px 40px rgba(99,102,241,0.2)}
+.gradient-text{background:linear-gradient(135deg,#6366f1,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gradient-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;border-radius:1rem;padding:0.75rem 1.5rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:'Outfit',sans-serif;font-size:1rem}
+.gradient-btn:hover{transform:scale(1.05);filter:brightness(1.1);box-shadow:0 12px 40px rgba(99,102,241,0.25)}
+.gradient-btn:active{transform:scale(0.95)}
+.screen{display:none;animation:fadeIn 0.4s ease-out}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float{animation:float 3s ease-in-out infinite}
+input[type="text"],input[type="email"],input[type="password"]{width:100%;padding:0.75rem 1rem;border-radius:1rem;border:1px solid rgba(199,194,232,0.5);background:rgba(237,233,254,0.4);outline:none;font-family:'Outfit',sans-serif;font-size:0.95rem;color:#1e1b4b;transition:all 0.3s}
+input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,241,0.15)}
+.answer-btn{width:100%;text-align:left;padding:1rem 1.25rem;border-radius:1rem;border:1px solid rgba(199,194,232,0.4);background:rgba(237,233,254,0.25);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:500;color:#1e1b4b;transition:all 0.2s}
+.answer-btn:hover{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);transform:scale(1.02)}
+.answer-btn:active{transform:scale(0.98)}
+.nav-btn{padding:0.5rem 0.75rem;border-radius:0.75rem;font-size:0.875rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:#6b7280;transition:all 0.3s;font-family:'Outfit',sans-serif}
+.nav-btn.active{background:rgba(99,102,241,0.1);color:#6366f1}
+.nav-btn:hover{color:#1e1b4b;background:rgba(237,233,254,0.5)}
+.stat-card{text-align:center;padding:1.25rem}
+.progress-ring{transform:rotate(-90deg)}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:1rem;border-radius:0.75rem;background:rgba(237,233,254,0.3);border:1px solid rgba(199,194,232,0.3);margin-bottom:0.75rem}
+.auth-tab {
+  transition: all 0.3s;
+}
+.auth-tab.active {
+  background: white;
+  box-shadow: 0 4px 15px rgba(99,102,241,0.15);
+  color: #6366f1;
+}
+</style>
+</head>
+<body>
+<div id="app" class="min-h-screen">
+<!-- AUTH SCREEN (Регистрация + Вход) -->
+<div id="screen-auth" class="screen active">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass p-8 md:p-12 w-full max-w-md">
+
+      <div class="text-center mb-8">
+        <div class="text-5xl mb-4 float">🪞</div>
+        <h1 class="text-3xl font-bold gradient-text">MindMirror</h1>
+        <p class="text-gray-500 mt-2">Загляни внутрь себя</p>
+      </div>
+
+      <div class="flex rounded-3xl bg-white/50 p-1 mb-8">
+        <button onclick="switchAuthTab(0)" id="tab-login" 
+                class="flex-1 py-3 rounded-3xl font-medium transition-all auth-tab active">Войти</button>
+        <button onclick="switchAuthTab(1)" id="tab-register" 
+                class="flex-1 py-3 rounded-3xl font-medium transition-all auth-tab">Регистрация</button>
+      </div>
+
+      <!-- Форма ВХОДА -->
+      <form id="login-form" class="space-y-5" onsubmit="return handleLogin(event)">
+        <div>
+          <label class="text-sm font-medium mb-1.5 block">Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com">
+          <p id="err-login-email" class="text-red-500 text-xs mt-1 hidden"></p>
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1.5 block">Пароль</label>
+          <input type="password" id="login-password" placeholder="Ваш пароль">
+          <p id="err-login-password" class="text-red-500 text-xs mt-1 hidden"></p>
+        </div>
+        <button type="submit" class="gradient-btn w-full">Войти</button>
+      </form>
+
+      <!-- Форма РЕГИСТРАЦИИ -->
+      <form id="register-form" class="space-y-5 hidden" onsubmit="return handleRegister(event)">
+        <div>
+          <label class="text-sm font-medium mb-1.5 block">Имя</label>
+          <input type="text" id="reg-name" placeholder="Как вас зовут?">
+          <p id="err-name" class="text-red-500 text-xs mt-1 hidden"></p>
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1.5 block">Email</label>
+          <input type="email" id="reg-email" placeholder="you@example.com">
+          <p id="err-email" class="text-red-500 text-xs mt-1 hidden"></p>
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1.5 block">Пароль</label>
+          <input type="password" id="reg-password" placeholder="Минимум 6 символов">
+          <p id="err-password" class="text-red-500 text-xs mt-1 hidden"></p>
+        </div>
+        <button type="submit" class="gradient-btn w-full">Зарегистрироваться</button>
+      </form>
+
+      <p id="auth-message" class="text-center text-sm mt-6 text-red-500"></p>
+    </div>
+  </div>
+</div>
+<div id="main-wrapper" class="hidden min-h-screen p-4 md:p-6 max-w-5xl mx-auto">
+
+<!-- NAV -->
+<nav class="glass px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+  <div class="flex items-center gap-3">
+    <!-- Гамбургер (мобильный) -->
+    <button id="hamburger-btn" 
+            class="md:hidden w-10 h-10 flex items-center justify-center text-3xl text-gray-700 hover:text-indigo-600 transition-colors">
+      ☰
+    </button>
+    
+    <div onclick="showScreen('dashboard')" class="flex items-center gap-2 cursor-pointer">
+      <span class="text-3xl">🪞</span>
+      <span class="font-bold text-2xl gradient-text" style="font-family:'Space Grotesk'">MindMirror</span>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <div class="text-sm text-gray-600 hidden md:block">
+      Привет, <span class="font-semibold text-gray-800" id="nav-username"></span>
+    </div>
+    <div onclick="showScreen('account')" 
+         class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold cursor-pointer hover:scale-105 transition-transform">
+      <span id="nav-avatar-letter"></span>
+    </div>
+  </div>
+</nav>
+<!-- БОКОВАЯ ПАНЕЛЬ + ОВЕРЛЕЙ -->
+<div class="flex h-[calc(100vh-73px)]">   <!-- ← Важное исправление: фиксированная высота -->
+
+  <!-- Sidebar -->
+  <div id="sidebar" 
+       class="fixed md:static inset-y-0 left-0 w-64 glass min-h-screen p-4 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col overflow-y-auto">
+    
+    <div class="flex justify-end md:hidden mb-4">
+      <button onclick="toggleSidebar()" class="text-3xl text-gray-500">✕</button>
+    </div>
+
+    <div class="space-y-1 flex-1">
+      <!-- все кнопки меню без изменений -->
+      <button onclick="showScreen('dashboard');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-dashboard">
+        🏠 <span>Главная</span>
+      </button>
+      <button onclick="showScreen('tests');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-tests">
+        📋 <span>Тесты</span>
+      </button>
+      <button onclick="showScreen('ai');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-ai">
+        🪞 <span>MindMirror AI</span>
+      </button>
+      <button onclick="showScreen('account');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-account">
+        👤 <span>Профиль</span>
+      </button>
+      <button onclick="showScreen('support');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-support">
+        📧 <span>Поддержка</span>
+      </button>
+      <button onclick="showScreen('consultation');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-consultation">
+        🧑‍⚕️ <span>Консультация</span>
+      </button>
+      <button onclick="showScreen('games');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-games">
+        🎮 <span>Мини-игры</span>
+      </button>
+      <button onclick="showScreen('premium');toggleSidebar()" 
+              id="nav-premium"
+              class="nav-btn w-full justify-start flex items-center gap-3 text-left bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:brightness-110">
+        ✨ <span>Premium</span>
+      </button>
+    </div>
+
+    <div class="mt-auto pt-6 border-t border-white/30">
+      <button onclick="handleLogout();toggleSidebar()" 
+              class="w-full text-left text-red-500 hover:text-red-600 flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-red-50 transition-colors">
+        ⬅️ Выйти
+      </button>
+    </div>
+  </div>
+
+  <!-- Оверлей -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 hidden md:hidden z-40"></div>
+
+  <!-- Основной контент — теперь с прокруткой -->
+  <div class="flex-1 overflow-y-auto p-4 md:p-6 max-w-5xl mx-auto w-full bg-transparent">
+  <!-- DASHBOARD -->
+  <div id="screen-dashboard" class="screen active">
+    <div class="glass p-6 md:p-8 mb-6">
+      <h2 class="text-2xl md:text-3xl font-bold"><span id="greeting"></span>, <span class="gradient-text" id="dash-name"></span> ✨</h2>
+      <p class="text-gray-500 mt-2" id="dash-subtitle"></p>
+    </div>
+    <div class="glass p-6 mb-6">
+      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">📊 Динамика настроения</h3>
+      <div style="height:220px"><canvas id="moodChart"></canvas></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="glass stat-card"><div class="text-3xl mb-2">🧪</div><div class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="stat-count">0</div><div class="text-sm text-gray-500">Тестов пройдено</div></div>
+      <div class="glass stat-card"><div class="text-3xl mb-2">📈</div><div class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="stat-mood">—/10</div><div class="text-sm text-gray-500">Последнее настроение</div></div>
+      <div class="glass stat-card cursor-pointer hover:scale-105 transition-transform" onclick="showScreen('tests')"><div class="text-3xl mb-2">🚀</div><div class="text-lg font-bold gradient-text" style="font-family:'Space Grotesk'">Начать тест</div><div class="text-sm text-gray-500">Пройти прямо сейчас</div></div>
+    </div>
+  </div>
+
+  <!-- TESTS CATALOG -->
+  <div id="screen-tests" class="screen">
+    <div class="text-center mb-6">
+      <h2 class="text-2xl md:text-3xl font-bold">Каталог тестов</h2>
+      <p class="text-gray-500 mt-1">Выберите тест для самодиагностики</p>
+    </div>
+    <div class="max-w-md mx-auto mb-8 relative">
+      <div class="glass flex items-center px-5 py-3 rounded-3xl">
+        <span class="text-2xl mr-3">🔍</span>
+        <input id="search-input" type="text" placeholder="Поиск теста..." class="flex-1 bg-transparent outline-none text-lg placeholder-gray-400 font-medium">
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="test-cards"></div>
+    <div id="no-results" class="hidden text-center py-12">
+      <div class="text-6xl mb-4">😕</div>
+      <p class="text-xl text-gray-500">Ничего не найдено</p>
+    </div>
+  </div>
+
+  <!-- TESTING -->
+  <div id="screen-testing" class="screen">
+    <div class="max-w-2xl mx-auto">
+      <button class="text-gray-500 hover:text-gray-800 text-sm mb-4 cursor-pointer transition-colors" onclick="showScreen('tests')">← Назад к тестам</button>
+      <div class="glass p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold" style="font-family:'Space Grotesk'" id="test-title"></h3>
+          <span class="text-sm text-gray-500" id="test-progress-text"></span>
+        </div>
+        <div class="w-full h-2 bg-purple-100 rounded-full overflow-hidden mb-8">
+          <div class="h-full rounded-full transition-all duration-500" id="test-progress-bar" style="background:linear-gradient(135deg,#6366f1,#a855f7);width:0%"></div>
+        </div>
+        <p class="text-lg font-medium mb-8 leading-relaxed" id="test-question"></p>
+        <div class="space-y-3" id="test-answers"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="screen-results" class="screen">
+    <div class="max-w-3xl mx-auto space-y-6">
+      <div class="glass p-8 text-center">
+        <div class="text-5xl mb-4" id="result-emoji"></div>
+        <h2 class="text-2xl font-bold mb-2" style="font-family:'Space Grotesk'">Результаты</h2>
+        <p class="text-lg font-semibold" id="result-verdict"></p>
+        <div class="mt-6 mx-auto" style="width:192px;height:192px;position:relative">
+          <svg viewBox="0 0 100 100" class="w-full h-full progress-ring">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#e9d5ff" stroke-width="8"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke-width="8" stroke-linecap="round" id="result-circle" stroke-dasharray="0 264"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <span class="text-3xl font-bold" style="font-family:'Space Grotesk'" id="result-pct"></span>
+            <span class="text-xs text-gray-500" id="result-score"></span>
+          </div>
+        </div>
+        <div class="mt-6 grid grid-cols-2 gap-3 text-sm hidden" id="result-details"></div>
+      </div>
+      <div>
+        <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">💡 Рекомендации для вас</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="result-advice"></div>
+      </div>
+      <div class="flex gap-3 justify-center">
+        <button class="px-6 py-3 rounded-2xl border border-purple-200 hover:bg-purple-50 transition-all cursor-pointer" onclick="showScreen('tests')">Другие тесты</button>
+        <button class="gradient-btn" onclick="showScreen('dashboard')">На главную</button>
+      </div>
+    </div>
+  </div>
+
+ <!-- ACCOUNT SCREEN -->
+<div id="screen-account" class="screen">
+  <div class="max-w-2xl mx-auto space-y-6">
+    
+    <!-- Карточка профиля -->
+    <div class="glass p-6 md:p-8">
+      <div class="flex items-center gap-4 mb-6">
+        <div onclick="triggerAvatarUpload()" 
+             class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl text-white font-bold cursor-pointer overflow-hidden border-4 border-white shadow-lg hover:scale-105 transition-all bg-cover bg-center"
+             id="account-avatar"
+             style="background: linear-gradient(135deg, #6366f1, #a855f7);">
+          <!-- аватар будет вставлен через JS -->
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="account-name"></h2>
+          <p class="text-sm text-gray-500" id="account-email"></p>
+          <p class="text-xs text-gray-400 mt-1" id="account-date"></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <button onclick="editProfile()" 
+                class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-all flex items-center justify-center gap-2">
+          ✏️ Редактировать профиль
+        </button>
+        
+       <button onclick="openFeedbackModal()" 
+            class="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-medium transition-all flex items-center justify-center gap-2">
+      ⭐ Оставить отзыв
+    </button>
+
+        <button onclick="handleLogout()" 
+                class="px-5 py-3 rounded-2xl border border-red-200 text-red-500 hover:bg-red-50 transition-all text-sm font-medium cursor-pointer">
+          Выйти из аккаунта
+        </button>
+      </div>
+    </div>
+
+    <!-- История тестов -->
+    <div class="glass p-6">
+      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">📜 История тестов</h3>
+      <div id="history-list" class="space-y-3"></div>
+    </div>
+        <!-- История консультаций -->
+    <div class="glass p-6">
+      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">🧑‍⚕️ История консультаций</h3>
+      <div id="consultation-history" class="space-y-3"></div>
+    </div>
+  </div>
+</div>
+<!-- ====================== ПОДДЕРЖКА ====================== -->
+<div id="screen-support" class="screen">
+  <div class="glass p-8 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk'">📧 Техническая поддержка</h2>
+    <form onsubmit="handleContact(event)" class="space-y-6">
+      <div>
+        <label class="block text-sm font-medium mb-2">Имя</label>
+        <input id="support-name" type="text" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-2">Email</label>
+        <input id="support-email" type="email" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-2">Тема</label>
+        <input id="support-subject" type="text" placeholder="Коротко опишите проблему" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-2">Сообщение</label>
+        <textarea id="support-message" rows="6" placeholder="Опишите подробно..." class="w-full px-5 py-4 rounded-3xl border border-gray-300 focus:border-indigo-500 outline-none resize-none"></textarea>
+      </div>
+      <button type="submit" class="gradient-btn w-full py-4 text-lg">Отправить в поддержку</button>
+    </form>
+  </div>
+</div>
+
+<!-- ====================== КОНСУЛЬТАЦИЯ ====================== -->
+<div id="screen-consultation" class="screen">
+  <div class="max-w-3xl mx-auto">
+    <div class="glass p-8">
+      <h2 class="text-3xl font-bold mb-6" style="font-family:'Space Grotesk'">🧑‍⚕️ Запись на консультацию с психологом</h2>
+      
+      <!-- Форма новой записи -->
+      <div class="mb-12">
+        <h3 class="text-xl font-semibold mb-4">Новая заявка</h3>
+        <form id="consultation-form" onsubmit="handleBookConsultation(event)" class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium mb-2">Тема консультации</label>
+            <select id="consult-topic" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
+              <option value="">Выберите тему...</option>
+              <option value="Тревога и стресс">Тревога и стресс</option>
+              <option value="Депрессия и настроение">Депрессия и настроение</option>
+              <option value="Отношения и семья">Отношения и семья</option>
+              <option value="Самооценка и уверенность">Самооценка и уверенность</option>
+              <option value="Другое">Другое</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-2">Желаемая дата и время</label>
+            <input id="consult-date" type="datetime-local" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-2">Дополнительные заметки (по желанию)</label>
+            <textarea id="consult-notes" rows="4" placeholder="Расскажите кратко, о чём хотите поговорить..." class="w-full px-5 py-4 rounded-3xl border border-gray-300 focus:border-indigo-500 outline-none resize-none"></textarea>
+          </div>
+          
+          <button type="submit" class="gradient-btn w-full py-4 text-lg">📅 Записаться на консультацию</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ====================== МИНИ-ИГРЫ ====================== -->
+<div id="screen-games" class="screen">
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold">🎮 Мини-игры для спокойствия</h2>
+    <p class="text-gray-500 mt-2">Выберите игру, которая поможет прямо сейчас</p>
+  </div>
+  <div id="games-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+</div>
+<!-- Модальное окно редактирования профиля -->
+<div id="modal-edit-profile" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+  <div class="glass max-w-md w-full mx-4 p-8 rounded-3xl">
+    <h2 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk'">Редактировать профиль</h2>
+    
+    <div class="space-y-6">
+      <div>
+        <label class="block text-sm font-medium mb-2">Имя</label>
+        <input id="edit-name" type="text" 
+               class="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-2">Аватар</label>
+        <input id="edit-avatar" type="file" accept="image/*" class="w-full">
+        <p class="text-xs text-gray-500 mt-1">Можно загрузить новое фото (макс. 10 МБ)</p>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-8">
+      <button onclick="closeEditModal()" 
+              class="flex-1 py-3 rounded-2xl border border-gray-300 hover:bg-gray-100 transition-all">
+        Отмена
+      </button>
+      <button onclick="saveProfileChanges()" 
+              class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all">
+        Сохранить изменения
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО ОТЗЫВА -->
+<div id="modal-feedback" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+  <div class="glass max-w-md w-full mx-4 p-8 rounded-3xl">
+    <h2 class="text-2xl font-bold mb-6 text-center" style="font-family:'Space Grotesk'">Как вам MindMirror?</h2>
+    
+    <div class="text-center mb-8">
+      <p class="text-gray-600 mb-4">Поставьте оценку</p>
+      <div id="star-rating" class="flex justify-center gap-2 text-4xl cursor-pointer">
+        <span data-value="1">☆</span>
+        <span data-value="2">☆</span>
+        <span data-value="3">☆</span>
+        <span data-value="4">☆</span>
+        <span data-value="5">☆</span>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label class="block text-sm font-medium mb-2">Ваш комментарий (по желанию)</label>
+      <textarea id="feedback-comment" rows="4" 
+                class="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:border-indigo-500 resize-y"
+                placeholder="Что вам понравилось? Что можно улучшить?"></textarea>
+    </div>
+
+    <div class="flex gap-3">
+      <button onclick="closeFeedbackModal()" 
+              class="flex-1 py-3 rounded-2xl border border-gray-300 hover:bg-gray-100 transition-all">
+        Отмена
+      </button>
+      <button onclick="submitFeedback()" 
+              class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all">
+        Отправить отзыв
+      </button>
+    </div>
+  </div>
+</div>
+
+ <!-- ====================== MINDMIRROR AI (КРАСИВЫЙ + РАБОЧИЙ) ====================== -->
+<div id="screen-ai" class="screen">
+  <div class="max-w-3xl mx-auto h-[calc(100vh-100px)] flex flex-col p-4">
+
+    <!-- Шапка -->
+    <div class="glass rounded-3xl px-6 py-4 mb-6 flex items-center gap-4">
+      <div class="w-11 h-11 bg-gradient-to-br from-amber-400 to-yellow-300 rounded-2xl flex items-center justify-center text-4xl shadow-inner">🪞</div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">MindMirror AI</h2>
+        <p class="text-sm text-gray-500">Твоё зеркало души</p>
+      </div>
+    </div>
+
+    <!-- Приветственная карточка -->
+    <div id="ai-welcome" class="flex-1 glass rounded-3xl p-10 flex flex-col items-center justify-center text-center">
+      <div class="text-8xl mb-8">🪞</div>
+      <h3 class="text-3xl font-semibold text-gray-800 mb-3">Привет! Я MindMirror AI.</h3>
+      <p class="text-xl text-gray-600 max-w-md">Расскажи, что у тебя на душе сегодня?</p>
+    </div>
+
+    <!-- Чат-сообщения -->
+    <div id="ai-messages" class="flex-1 overflow-y-auto space-y-6 px-2 hidden"></div>
+
+    <!-- Поле ввода -->
+    <div class="glass rounded-3xl p-3 mt-4">
+      <div class="flex gap-3">
+        <input 
+          id="ai-input" 
+          type="text" 
+          placeholder="Напиши, что у тебя на душе..." 
+          class="flex-1 px-7 py-6 bg-white rounded-3xl outline-none text-lg placeholder-gray-400 focus:border-purple-400 border border-transparent"
+          onkeypress="if(event.key === 'Enter') sendAIMessage()">
+        <button onclick="sendAIMessage()" 
+                class="px-10 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-medium rounded-3xl hover:brightness-110 transition-all">
+          Отправить
+        </button>
+      </div>
+    </div>
+
+    <!-- Быстрые кнопки -->
+    <div class="flex flex-wrap gap-2 mt-5 justify-center">
+      <button onclick="quickAIMessage('Переформулировать мысль')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Переформулировать мысль</button>
+      <button onclick="quickAIMessage('Разобрать ситуацию')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Разобрать ситуацию</button>
+      <button onclick="quickAIMessage('Мне тяжело')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Мне тяжело</button>
+      <button onclick="quickAIMessage('Анализ дневника')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Анализ дневника</button>
+    </div>
+
+  </div>
+</div>
+  <!-- ====================== ИГРА: САД БЛАГОДАРНОСТИ ====================== -->
+<div id="screen-garden" class="screen hidden">
+  <div class="max-w-3xl mx-auto">
+    <div class="glass p-6 md:p-8">
+      <!-- Заголовок -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-bold gradient-text">Сад Благодарности</h2>
+          <p class="text-gray-500">Посади то, за что ты благодарен сегодня</p>
+        </div>
+        <button onclick="exitGarden()" 
+                class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
+      </div>
+
+      <!-- Этапы -->
+      <div id="garden-stage-1" class="stage">
+        <div class="text-center mb-8">
+          <div class="text-6xl mb-4">🌱</div>
+          <h3 class="text-xl font-semibold mb-2">Что сделало твой день лучше?</h3>
+          <p class="text-gray-500">Напиши 3–5 вещей, за которые ты благодарен</p>
+        </div>
+
+        <div id="gratitude-inputs" class="space-y-3 mb-8"></div>
+
+        <button onclick="plantSeeds()" 
+                class="gradient-btn w-full py-4 text-lg">Посадить в сад 🌼</button>
+      </div>
+
+      <!-- Этап роста -->
+      <div id="garden-stage-2" class="stage hidden">
+        <div class="text-center mb-6">
+          <h3 class="text-2xl font-bold mb-2">Твой сад растёт...</h3>
+          <div id="growth-progress" class="h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-3000" style="width:0%"></div>
+        </div>
+        <canvas id="garden-canvas" width="700" height="420" class="mx-auto bg-gradient-to-b from-sky-100 to-emerald-100 rounded-3xl shadow-inner"></canvas>
+      </div>
+
+      <!-- Финальный результат -->
+      <div id="garden-stage-3" class="stage hidden text-center">
+        <div class="mb-6">
+          <h2 class="text-3xl font-bold gradient-text mb-2">Твой прекрасный сад готов ✨</h2>
+          <p class="text-gray-600">Каждый цветок — это твоя благодарность</p>
+        </div>
+        <canvas id="final-garden-canvas" width="700" height="420" class="mx-auto bg-gradient-to-b from-sky-100 to-emerald-100 rounded-3xl shadow-inner"></canvas>
+        
+        <div class="flex gap-4 justify-center mt-8">
+          <button onclick="restartGarden()" 
+                  class="px-8 py-3 rounded-2xl border border-purple-200 hover:bg-purple-50">Посадить ещё</button>
+          <button onclick="downloadGarden()" 
+                  class="gradient-btn">Сохранить как обои</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ====================== ИГРА: КРУГ СПОКОЙСТВИЯ ====================== -->
+<div id="screen-breathing" class="screen hidden">
+  <div class="max-w-lg mx-auto">
+    <div class="glass p-6 md:p-8">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-bold gradient-text">Круг Спокойствия</h2>
+          <p class="text-gray-500">Дыши медленно — и успокой ум</p>
+        </div>
+        <button onclick="exitBreathing()" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <div id="breathing-circle" 
+             class="w-80 h-80 rounded-full border-8 border-purple-300 flex items-center justify-center text-6xl shadow-2xl transition-all duration-3000 mx-auto mb-10">
+          🌬️
+        </div>
+
+        <div class="text-center mb-8">
+          <div id="breathing-instruction" class="text-2xl font-semibold text-purple-700 mb-2">Вдох...</div>
+          <div id="breathing-count" class="text-5xl font-bold text-gray-300">4</div>
+        </div>
+
+        <div class="flex gap-4">
+          <button onclick="startBreathing()" 
+                  id="start-breathing-btn"
+                  class="gradient-btn px-10 py-4 text-lg">Начать дыхание</button>
+          
+          <button onclick="exitBreathing()" 
+                  class="px-8 py-4 rounded-3xl border border-gray-300 hover:bg-gray-100">Завершить</button>
+        </div>
+      </div>
+
+      <div id="breathing-complete" class="hidden text-center mt-8">
+        <div class="text-5xl mb-4">✨</div>
+        <h3 class="text-2xl font-bold mb-2">Отличная работа!</h3>
+        <p class="text-gray-600">Ты только что снизил уровень стресса ❤️</p>
+        <button onclick="restartBreathing()" class="mt-6 gradient-btn">Ещё раз</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ====================== ИГРА: ПУЗЫРИ СТРЕССА ====================== -->
+<div id="screen-bubbles" class="screen hidden">
+  <div class="max-w-4xl mx-auto">
+    <div class="glass p-6 md:p-8">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-bold gradient-text">Пузыри Стресса</h2>
+          <p class="text-gray-500">Лопай негатив — получай позитив ✨</p>
+        </div>
+        <button onclick="exitBubbles()" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
+      </div>
+
+      <div class="relative mx-auto" style="width:700px; height:480px;">
+        <canvas id="bubbles-canvas" width="700" height="480" 
+                class="rounded-3xl shadow-inner bg-gradient-to-br from-purple-50 to-pink-50"></canvas>
+        
+        <div id="bubbles-stats" class="absolute top-4 left-4 bg-white/80 backdrop-blur-md px-5 py-2 rounded-2xl text-sm font-medium">
+          Лопнуто: <span id="bubbles-popped" class="text-purple-600 font-bold">0</span>/15
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <button onclick="startBubblesGame()" id="start-bubbles-btn"
+                class="gradient-btn px-10 py-4 text-lg">Начать сеанс</button>
+      </div>
+
+      <div id="bubbles-complete" class="hidden text-center mt-8">
+        <div class="text-6xl mb-4">🎉</div>
+        <h3 class="text-2xl font-bold mb-2">Отличная работа!</h3>
+        <p class="text-gray-600 mb-6">Ты только что освободил(а) свой разум от стресса</p>
+        <button onclick="restartBubbles()" class="gradient-btn">Играть ещё раз</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ====================== PREMIUM SCREEN ====================== -->
+<div id="screen-premium" class="screen hidden">
+  <div class="max-w-3xl mx-auto p-6">
+    <div class="glass p-10 md:p-14 rounded-3xl">
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-3xl mb-6 text-lg font-semibold">
+          ✨ MindMirror Premium
+        </div>
+        <h2 class="text-4xl font-bold mb-3">Полная версия<br>самопознания</h2>
+        <p class="text-xl text-gray-600">Без лимитов. С максимальной заботой о тебе.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <!-- Бесплатный план -->
+        <div class="glass p-8 rounded-3xl">
+          <h3 class="text-xl font-semibold mb-6">Бесплатно</h3>
+          <ul class="space-y-4">
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> 3 теста в неделю</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Базовый AI</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> 3 мини-игры</li>
+            <li class="flex items-start gap-3 text-gray-400"><span class="mt-1">✘</span> Неограниченные тесты</li>
+            <li class="flex items-start gap-3 text-gray-400"><span class="mt-1">✘</span> Полный AI + история</li>
+          </ul>
+        </div>
+
+<!-- Премиум план -->
+<div class="glass p-8 rounded-3xl border-2 border-purple-500 relative overflow-hidden">
+  <div class="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-6 py-1">ЛУЧШИЙ ВЫБОР</div>
+  
+  <h3 class="text-2xl font-bold text-purple-700 mb-2">Premium</h3>
+  <div class="flex items-baseline gap-2 mb-8">
+    <span class="text-5xl font-bold">990 ₸</span>
+    <span class="text-gray-500">/ месяц</span>
+  </div>
+
+  <ul class="space-y-4 mb-10">
+    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Неограниченные тесты</li>
+    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Полный MindMirror AI</li>
+    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Все мини-игры</li>
+    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Полная история + графики</li>
+    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Эксклюзивные тесты</li>
+    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Приоритет на консультации</li>
+  </ul>
+
+  <div class="flex gap-3">
+    <button onclick="showPaymentModal()" 
+            class="flex-1 gradient-btn py-5 text-lg font-semibold">
+      Оформить Premium
+    </button>
+    
+    <button onclick="cancelSubscription()" 
+            id="cancel-premium-btn"
+            class="flex-1 py-5 rounded-2xl border border-red-300 text-red-600 hover:bg-red-50 font-medium hidden">
+      Отменить подписку
+    </button>
+  </div>
+</div>
+
+      <p class="text-center text-xs text-gray-500">Отмена в любой момент • Автоматическое продление</p>
+    </div>
+  </div>
+</div>
+  
+  <!-- MINI GAMES SCREEN -->
+<div id="screen-games" class="screen">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold gradient-text">🎮 Мини-игры</h2>
+      <p class="text-gray-500 mt-2">Инструменты для быстрого восстановления и развития</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="games-grid">
+      <!-- Игры будут подгружаться через JS -->
+    </div>
+  </div>
+</div>
+</div> <!-- Закрытие основного контента -->
+  </div>   <!-- Закрытие flex (sidebar + content) -->
+</div><!-- /main-wrapper -->
+</div><!-- /app -->
+<script>
+
+// ===== DATA =====
+const answerOptions = [
+  {label:"Никогда",value:0},{label:"Редко",value:1},{label:"Иногда",value:2},{label:"Часто",value:3},{label:"Постоянно",value:4}
+];
+const tests = [
+  {
+    id:"eq", title:"Эмоциональный интеллект (EQ)", description:"Оцените способность распознавать и управлять эмоциями — своими и чужими.", icon:"🧠",
+    questions:[
+      {text:"Я легко определяю, что чувствую в конкретный момент.",cat:"self-awareness"},
+      {text:"Я понимаю, как мои эмоции влияют на мои решения.",cat:"self-awareness"},
+      {text:"Я способен точно назвать свою эмоцию (гнев, грусть, тревога и т.д.).",cat:"self-awareness"},
+      {text:"Я замечаю изменения в своём настроении до того, как они начинают влиять на поведение.",cat:"self-awareness"},
+      {text:"Я знаю свои сильные и слабые стороны в общении.",cat:"self-awareness"},
+      {text:"Я могу успокоиться, когда чувствую сильное раздражение.",cat:"self-regulation"},
+      {text:"Я контролирую импульсивные реакции в стрессовых ситуациях.",cat:"self-regulation"},
+      {text:"Я способен адаптироваться к неожиданным изменениям планов.",cat:"self-regulation"},
+      {text:"Я легко считываю эмоции других людей по выражению лица.",cat:"empathy"},
+      {text:"Я чувствую, когда человеку рядом плохо, даже если он молчит.",cat:"empathy"},
+      {text:"Мне легко поставить себя на место другого.",cat:"empathy"},
+      {text:"Я внимательно слушаю собеседника, не перебивая.",cat:"empathy"},
+      {text:"Я умею разрешать конфликты, учитывая чувства обеих сторон.",cat:"social"},
+      {text:"Мне легко устанавливать контакт с новыми людьми.",cat:"social"},
+      {text:"Я могу вдохновить или поддержать человека словами.",cat:"social"}
+    ]
+  },
+  {
+    id:"hads", title:"Шкала HADS", description:"Госпитальная шкала тревоги и депрессии для оценки вашего эмоционального состояния.", icon:"💜",
+    questions:[
+      {text:"Я испытываю напряжённость, мне не по себе.",cat:"anxiety"},
+      {text:"Я испытываю страх, кажется, будто что-то ужасное может вот-вот случиться.",cat:"anxiety"},
+      {text:"Беспокойные мысли крутятся у меня в голове.",cat:"anxiety"},
+      {text:"Я легко могу сесть и расслабиться.",cat:"anxiety"},
+      {text:"Я испытываю внутреннее напряжение или дрожь.",cat:"anxiety"},
+      {text:"Я чувствую неусидчивость, мне хочется постоянно двигаться.",cat:"anxiety"},
+      {text:"У меня бывает внезапное чувство паники.",cat:"anxiety"},
+      {text:"То, что приносило мне удовольствие, и сейчас вызывает такое же чувство.",cat:"depression"},
+      {text:"Я способен рассмеяться и увидеть забавную сторону событий.",cat:"depression"},
+      {text:"Я чувствую себя бодрым и энергичным.",cat:"depression"},
+      {text:"Мне кажется, что я стал делать всё очень медленно.",cat:"depression"},
+      {text:"Я не слежу за своей внешностью так, как раньше.",cat:"depression"},
+      {text:"Я с удовольствием предвкушаю предстоящие события.",cat:"depression"},
+      {text:"Я могу получить удовольствие от хорошей книги или фильма.",cat:"depression"}
+    ]
+  },
+  {
+    id:"sleep", title:"Тест качества сна", description:"Оцените гигиену сна и уровень дневной усталости для улучшения восстановления.", icon:"🌙",
+    questions:[
+      {text:"Мне трудно заснуть в течение 30 минут после того, как я лёг в кровать."},
+      {text:"Я просыпаюсь среди ночи и не могу заснуть обратно."},
+      {text:"Я просыпаюсь слишком рано утром и больше не могу уснуть."},
+      {text:"После пробуждения я чувствую себя разбитым и невыспавшимся."},
+      {text:"Днём я испытываю сильную сонливость и усталость."},
+      {text:"Я использую телефон или ноутбук в кровати перед сном."},
+      {text:"Я пью кофе или энергетики во второй половине дня."},
+      {text:"Мой режим сна нерегулярный — я засыпаю и встаю в разное время."},
+      {text:"Я чувствую раздражительность из-за недосыпа."},
+      {text:"Мне сложно сосредоточиться на задачах из-за усталости."}
+    ]
+  },
+  {
+    id: "burnout",
+    title: "Тест на выгорание (Burnout)",
+    description: "Оцените уровень эмоционального истощения, апатии и потери мотивации.",
+    icon: "🔥",
+    questions: [
+      { text: "Я чувствую себя эмоционально истощённым на работе/в учёбе.", cat: "exhaustion" },
+      { text: "В конце дня я полностью обессилен и не хочу ничего делать.", cat: "exhaustion" },
+      { text: "Я стал менее энергичным и жизнерадостным, чем раньше.", cat: "exhaustion" },
+      { text: "Мне всё чаще хочется просто «отключиться» от всего.", cat: "exhaustion" },
+      { text: "Я отношусь к людям (коллегам, клиентам, близким) более цинично.", cat: "depersonalization" },
+      { text: "Мне стало безразлично, как идут дела у других.", cat: "depersonalization" },
+      { text: "Я чувствую, что люди вокруг меня раздражают меня сильнее обычного.", cat: "depersonalization" },
+      { text: "Я стал меньше сопереживать проблемам других.", cat: "depersonalization" },
+      { text: "Я сомневаюсь в своей компетентности и полезности.", cat: "accomplishment" },
+      { text: "Мне кажется, что мои усилия не приносят результата.", cat: "accomplishment" },
+      { text: "Я потерял интерес к тому, чем раньше гордился.", cat: "accomplishment" },
+      { text: "У меня пропала мотивация развиваться в своей сфере.", cat: "accomplishment" },
+      { text: "Я часто думаю: «Зачем я этим занимаюсь?»", cat: "accomplishment" }
+    ]
+  },
+  {
+    id: "selfesteem",
+    title: "Тест на самооценку (Розенберг)",
+    description: "Оцените уровень своей самооценки и уверенности в себе.",
+    icon: "🌟",
+    questions: [
+      { text: "Я чувствую, что я человек, достойный уважения.", cat: "positive" },
+      { text: "У меня есть ряд хороших качеств.", cat: "positive" },
+      { text: "В целом я склонен считать себя неудачником.", cat: "negative" },
+      { text: "Я способен делать всё не хуже большинства других людей.", cat: "positive" },
+      { text: "Мне кажется, что у меня мало чем можно гордиться.", cat: "negative" },
+      { text: "Я отношусь к себе положительно.", cat: "positive" },
+      { text: "В целом я доволен собой.", cat: "positive" },
+      { text: "Мне хотелось бы уважать себя больше.", cat: "negative" },
+      { text: "Иногда я чувствую себя бесполезным.", cat: "negative" },
+      { text: "Я думаю, что я хороший человек.", cat: "positive" }
+    ]
+  },
+  {
+    id: "distortions",
+    title: "Когнитивные искажения",
+    description: "Выявите типичные ошибки мышления, которые влияют на ваше настроение и решения.",
+    icon: "🧩",
+    questions: [
+      { text: "Если я ошибся — я полный неудачник.", cat: "all_or_nothing" },
+      { text: "Одна неудача значит, что у меня никогда ничего не получится.", cat: "overgeneralization" },
+      { text: "Я сосредотачиваюсь только на том, что пошло плохо, и игнорирую хорошее.", cat: "mental_filter" },
+      { text: "Я знаю, что другие люди думают обо мне плохо, даже если они этого не говорят.", cat: "mind_reading" },
+      { text: "Если что-то может пойти плохо — оно обязательно пойдёт плохо.", cat: "catastrophizing" },
+      { text: "Я должен/должна всё делать идеально, иначе я ни на что не гожусь.", cat: "should_statements" },
+      { text: "Я чувствую себя виноватым за то, в чём на самом деле не виноват.", cat: "personalization" },
+      { text: "Если я не самый лучший — значит я полный ноль.", cat: "all_or_nothing" },
+      { text: "Я всегда предсказываю негативный исход событий.", cat: "jumping_to_conclusions" },
+      { text: "Мои эмоции — это правда о реальности (если я чувствую себя неудачником, значит я им и являюсь).", cat: "emotional_reasoning" },
+      { text: "Я часто использую слова «всегда», «никогда», «никто», «все».", cat: "overgeneralization" },
+      { text: "Я обесцениваю свои успехи («это не считается», «мне просто повезло»).", cat: "disqualifying_positive" }
+    ]
+  }
+];
+const adviceDB = {
+  eq:{
+    low:[
+      {title:"Продолжайте практику",desc:"Ваш EQ высокий! Поддерживайте осознанность через ежедневную медитацию 10 минут.",icon:"🧘"},
+      {title:"Ментальный дневник",desc:"Ведите журнал благодарности — записывайте 3 вещи каждый вечер.",icon:"📓"},
+      {title:"Помогайте другим",desc:"Делитесь эмоциональными навыками — станьте наставником для близких.",icon:"🤝"}
+    ],
+    moderate:[
+      {title:"Практика осознанности",desc:"Начните с 5-минутной медитации body scan каждое утро.",icon:"🧘"},
+      {title:"Активное слушание",desc:"Тренируйте умение слушать: повторяйте суть сказанного собеседником.",icon:"👂"},
+      {title:"Эмоциональный словарь",desc:"Расширяйте словарь эмоций — учитесь точнее называть свои чувства.",icon:"📖"}
+    ],
+    high:[
+      {title:"Дыхательная техника 4-7-8",desc:"Вдох 4 сек, задержка 7 сек, выдох 8 сек. Практикуйте при стрессе.",icon:"🌬️"},
+      {title:"Журнал эмоций",desc:"Записывайте свои эмоции 3 раза в день с описанием триггеров.",icon:"📝"},
+      {title:"Эмпатия через кино",desc:"Смотрите фильмы и пробуйте отслеживать эмоции персонажей.",icon:"🎬"}
+    ],
+    critical:[
+      {title:"Консультация психолога",desc:"Обратитесь к специалисту для развития эмоциональных навыков.",icon:"💬"},
+      {title:"Базовая саморегуляция",desc:"Начните с техники «СТОП»: Стой, Тихо, Ощути, Подумай.",icon:"🛑"},
+      {title:"Социальные навыки",desc:"Практикуйте простое общение: здоровайтесь, спрашивайте «как дела».",icon:"👋"}
+    ]
+  },
+  hads:{
+    low:[
+      {title:"Поддерживайте баланс",desc:"Ваше состояние стабильно! Продолжайте заботиться о ментальном здоровье.",icon:"✨"},
+      {title:"Физическая активность",desc:"30 минут ходьбы или лёгких упражнений поддерживают настроение.",icon:"🚶"},
+      {title:"Социальные связи",desc:"Проводите время с близкими — это лучшая профилактика тревоги.",icon:"❤️"}
+    ],
+    moderate:[
+      {title:"Прогрессивная релаксация",desc:"Напрягайте и расслабляйте мышцы от стоп до головы перед сном.",icon:"💆"},
+      {title:"Ограничьте новости",desc:"Сократите потребление новостей до 15 минут в день.",icon:"📵"},
+      {title:"Режим дня",desc:"Стабильный распорядок снижает уровень тревоги на 30%.",icon:"⏰"}
+    ],
+    high:[
+      {title:"Когнитивная перестройка",desc:"Записывайте тревожные мысли и ищите альтернативные объяснения.",icon:"🔄"},
+      {title:"Заземление 5-4-3-2-1",desc:"Назовите 5 вещей видите, 4 слышите, 3 чувствуете, 2 нюхаете, 1 вкус.",icon:"🌍"},
+      {title:"Обратитесь за помощью",desc:"Поговорите с психологом — тревога хорошо поддаётся терапии.",icon:"🩺"}
+    ],
+    critical:[
+      {title:"Срочная помощь",desc:"Обратитесь к психотерапевту. Позвоните на линию помощи: 8-800-2000-122.",icon:"🆘"},
+      {title:"Простые шаги",desc:"Начните с малого: тёплый душ, стакан воды, 5 глубоких вдохов.",icon:"🫧"},
+      {title:"Не оставайтесь одни",desc:"Свяжитесь с близким человеком и поделитесь своим состоянием.",icon:"📞"}
+    ]
+  },
+  sleep:{
+    low:[
+      {title:"Отличная гигиена сна!",desc:"Продолжайте соблюдать режим — вы хорошо восстанавливаетесь.",icon:"🌟"},
+      {title:"Утренний свет",desc:"15 минут яркого света утром укрепляют циркадный ритм.",icon:"☀️"},
+      {title:"Благодарность перед сном",desc:"Подумайте о 3 хороших моментах дня перед засыпанием.",icon:"🙏"}
+    ],
+    moderate:[
+      {title:"Цифровой закат",desc:"Уберите экраны за 1 час до сна или включите ночной режим.",icon:"📱"},
+      {title:"Ритуал вечера",desc:"Создайте 20-минутный ритуал: чтение → растяжка → дыхание.",icon:"🌸"},
+      {title:"Температура спальни",desc:"Оптимальная температура для сна — 18-20°C.",icon:"🌡️"}
+    ],
+    high:[
+      {title:"Фиксированный режим",desc:"Ложитесь и вставайте в одно время, даже в выходные.",icon:"📅"},
+      {title:"Кофеин до 14:00",desc:"Исключите кофе, чай и энергетики после обеда.",icon:"☕"},
+      {title:"Медитация для сна",desc:"Попробуйте Yoga Nidra — глубокое расслабление за 20 минут.",icon:"🧘"}
+    ],
+    critical:[
+      {title:"Обратитесь к сомнологу",desc:"Хронические нарушения сна требуют профессиональной помощи.",icon:"🏥"},
+      {title:"Дневник сна",desc:"2 недели записывайте время сна, пробуждений и самочувствие.",icon:"📋"},
+      {title:"Кровать = только сон",desc:"Не работайте и не смотрите видео в кровати — переучите мозг.",icon:"🛏️"}
+    ]
+  },
+  burnout: {
+    low: [
+      { title: "Отличный результат!", desc: "Вы в хорошей форме. Продолжайте балансировать работу и отдых.", icon: "🌟" },
+      { title: "Профилактика", desc: "Раз в неделю устраивайте полный цифровой детокс.", icon: "📴" },
+      { title: "Ресурсы", desc: "Ведите список маленьких побед — это укрепляет мотивацию.", icon: "🏆" }
+    ],
+    moderate: [
+      { title: "Границы", desc: "Научитесь говорить «нет» и защищать своё время.", icon: "🛡️" },
+      { title: "Восстановление", desc: "Вводите обязательные 1–2 дня полного отдыха в месяц.", icon: "🌿" },
+      { title: "Хобби", desc: "Верните в жизнь занятие, которое приносит чистую радость.", icon: "🎨" }
+    ],
+    high: [
+      { title: "Срочные меры", desc: "Сократите нагрузку. Обратитесь к психологу.", icon: "⚠️" },
+      { title: "Техника 80/20", desc: "Сосредоточьтесь только на самых важных задачах.", icon: "🎯" },
+      { title: "Отпуск", desc: "Запланируйте хотя бы короткий перерыв в ближайшие 2 недели.", icon: "✈️" }
+    ],
+    critical: [
+      { title: "Профессиональная помощь", desc: "Обратитесь к специалисту как можно скорее.", icon: "🆘" },
+      { title: "Полный reset", desc: "Рассмотрите возможность временно снизить нагрузку или взять отпуск.", icon: "🔄" },
+      { title: "Поддержка", desc: "Расскажите близким — не держите всё в себе.", icon: "🤝" }
+    ]
+  },
+    selfesteem: {
+    low: [
+      { title: "Работа над собой", desc: "Начните с ежедневных аффирмаций и списка своих сильных сторон.", icon: "📝" },
+      { title: "Маленькие победы", desc: "Ведите дневник достижений — даже самых незначительных.", icon: "🏆" },
+      { title: "Окружение", desc: "Проводите больше времени с людьми, которые вас поддерживают.", icon: "❤️" }
+    ],
+    moderate: [
+      { title: "Укрепление уверенности", desc: "Практикуйте выход из зоны комфорта: пробуйте новое.", icon: "🚀" },
+      { title: "Самосострадание", desc: "Относитесь к себе с такой же добротой, как к лучшему другу.", icon: "🤗" },
+      { title: "Физическая активность", desc: "Регулярные занятия спортом значительно повышают самооценку.", icon: "🏃" }
+    ],
+    high: [
+      { title: "Отличная самооценка!", desc: "Вы хорошо относитесь к себе. Продолжайте в том же духе.", icon: "🌟" },
+      { title: "Поддержка других", desc: "Делитесь своей уверенностью — помогайте друзьям.", icon: "🤝" },
+      { title: "Развитие", desc: "Ставьте амбициозные цели — ваша самооценка это выдержит.", icon: "🎯" }
+    ],
+    critical: []
+  },
+    distortions: {
+    low: [
+      { title: "Отличный результат!", desc: "У вас здоровое мышление. Продолжайте практиковать осознанность.", icon: "🌟" }
+    ],
+    moderate: [
+      { title: "Техника «Проверка фактов»", desc: "Спрашивайте себя: «Какие есть доказательства за и против этой мысли?»", icon: "🔍" },
+      { title: "Переформулировка", desc: "Заменяйте «я неудачник» на «я сделал ошибку и могу научиться».", icon: "📝" },
+      { title: "Дневник искажений", desc: "Записывайте автоматические мысли и ищите в них искажения.", icon: "📓" }
+    ],
+    high: [
+      { title: "Работа с искажениями", desc: "Самые частые у вас — catastrophizing и all-or-nothing. Начните с них.", icon: "⚠️" },
+      { title: "Эксперименты поведения", desc: "Проверяйте свои страшные прогнозы на практике.", icon: "🧪" },
+      { title: "MindMirror AI", desc: "Регулярно используйте чат для разбора автоматических мыслей.", icon: "🪞" }
+    ],
+    critical: [
+      { title: "Рекомендуется консультация", desc: "Большое количество искажений сильно влияет на настроение. Поговорите со специалистом.", icon: "🧑‍⚕️" }
+    ]
+  }
+};
+const catNames = {
+  "self-awareness":"Самосознание",
+  "self-regulation":"Саморегуляция",
+  "empathy":"Эмпатия",
+  "social":"Социальные навыки",
+  "anxiety":"Тревога",
+  "depression":"Депрессия",
+  "exhaustion": "Эмоциональное истощение",
+  "depersonalization": "Деперсонализация",
+  "accomplishment": "Снижение достижений",
+  "positive": "Позитивные утверждения",
+  "negative": "Обратные утверждения",
+  "all_or_nothing": "Чёрно-белое мышление",
+  "overgeneralization": "Сверхобобщение",
+  "mental_filter": "Ментальный фильтр",
+  "mind_reading": "Чтение мыслей",
+  "catastrophizing": "Катастрофизация",
+  "should_statements": "Долженствования",
+  "personalization": "Персонализация",
+  "jumping_to_conclusions": "Поспешные выводы",
+  "emotional_reasoning": "Эмоциональное мышление",
+  "disqualifying_positive": "Обесценивание позитивного"}
+const levelEmoji = {low:"🟢",moderate:"🟡",high:"🟠",critical:"🔴"};
+const levelColors = {low:"#22c55e",moderate:"#eab308",high:"#f97316",critical:"#ef4444"};
+const verdictColors = {low:"color:#22c55e",moderate:"color:#eab308",high:"color:#f97316",critical:"color:#ef4444"};
+// ===== STORAGE =====
+function getUser(){const d=localStorage.getItem("mindmirror_user");return d?JSON.parse(d):null}
+function saveUser(u){localStorage.setItem("mindmirror_user",JSON.stringify(u))}
+function getHistory(){
+  const user = getUser();
+  if (!user || !user.email) return [];
+  
+  const key = `mindmirror_history_${user.email}`;
+  const d = localStorage.getItem(key);
+  return d ? JSON.parse(d) : [];
+}
+
+function saveResult(r){
+  const user = getUser();
+  if (!user || !user.email) return;
+  
+  const key = `mindmirror_history_${user.email}`;
+  const h = getHistory();
+  h.push(r);
+  localStorage.setItem(key, JSON.stringify(h));
+}
+// ===== STATE =====
+let currentTest = null;
+let currentQ = 0;
+let currentAnswers = [];
+let moodChart = null;
+
+// ===== CONFIG =====
+const SERVER_URL = window.location.origin;
+// REGISTER
+async function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById("reg-name").value.trim();
+  const email = document.getElementById("reg-email").value.trim();
+  const pw = document.getElementById("reg-password").value;
+
+  // очистка ошибок
+  document.querySelectorAll("#err-name, #err-email, #err-password, #auth-message").forEach(el => {
+    el.classList.add("hidden");
+    if (el.id === "auth-message") el.textContent = "";
+  });
+
+  let valid = true;
+  if (!name) { document.getElementById("err-name").textContent = "Введите имя"; document.getElementById("err-name").classList.remove("hidden"); valid = false; }
+  if (!email.includes("@")) { document.getElementById("err-email").textContent = "Некорректный email"; document.getElementById("err-email").classList.remove("hidden"); valid = false; }
+  if (pw.length < 6) { document.getElementById("err-password").textContent = "Минимум 6 символов"; document.getElementById("err-password").classList.remove("hidden"); valid = false; }
+
+  if (!valid) return false;
+
+ try {
+    const response = await fetch(`${SERVER_URL}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' ,
+        'ngrok-skip-browser-warning': 'true'
+      },
+      body: JSON.stringify({ name, email, password: pw })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      saveUser({name, email, createdAt: new Date().toISOString()});
+      enterApp();
+    } else {
+      document.getElementById("auth-message").textContent = data.error || "Ошибка регистрации";
+      document.getElementById("auth-message").classList.remove("hidden");
+    }
+  } catch(e) {
+    document.getElementById("auth-message").textContent = "Сервер не отвечает. Убедись, что server.js запущен.";
+    document.getElementById("auth-message").classList.remove("hidden");
+    console.error(e);
+  }
+  return false;
+}
+
+// LOGIN (улучшенная версия с очисткой старых данных)
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  document.querySelectorAll("#err-login-email, #err-login-password, #auth-message").forEach(el => {
+    el.classList.add("hidden");
+    if (el.id === "auth-message") el.textContent = "";
+  });
+
+  if (!email.includes("@")) {
+    document.getElementById("err-login-email").textContent = "Введите корректный email";
+    document.getElementById("err-login-email").classList.remove("hidden");
+    return false;
+  }
+  if (!password) {
+    document.getElementById("err-login-password").textContent = "Введите пароль";
+    document.getElementById("err-login-password").classList.remove("hidden");
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${SERVER_URL}/api/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      const targetEmail = data.email;
+
+      // УДАЛЯЕМ истории ТОЛЬКО других пользователей (если вдруг сменил аккаунт)
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith("mindmirror_history_") && !key.includes(targetEmail)) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // Сохраняем текущего пользователя
+      saveUser({ 
+        name: data.name, 
+        email: data.email, 
+        createdAt: data.createdAt || new Date().toISOString() 
+      });
+      
+      enterApp();
+    } else {
+      document.getElementById("auth-message").textContent = data.error || "Неверный email или пароль";
+      document.getElementById("auth-message").classList.remove("hidden");
+    }
+  } catch(e) {
+    document.getElementById("auth-message").textContent = "Не удалось подключиться к серверу. Запусти server.js";
+    document.getElementById("auth-message").classList.remove("hidden");
+    console.error(e);
+  }
+  return false;
+}
+// ===== NAVIGATION =====
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+  const screen = document.getElementById("screen-" + id);
+  if (screen) screen.classList.add("active");
+
+  // Подсветка в сайдбаре
+  const navBtn = document.getElementById("nav-" + id);
+  if (navBtn) navBtn.classList.add("active");
+
+  if(id === "dashboard") renderDashboard();
+  if(id === "tests") renderTestCatalog();
+  if(id === "account") renderAccount();
+  if(id === "ai") renderAIChat();
+  if (id === "support") {
+    const user = getUser();
+    if (user) {
+      document.getElementById("support-name").value = user.name || '';
+      document.getElementById("support-email").value = user.email || '';
+    }
+  }
+  if (id === "consultation") {
+    generateConsultationSlots();
+    loadConsultationHistory && loadConsultationHistory();
+  }
+}
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const user=getUser();if(!user)return;
+  const h=new Date().getHours();
+  const gr=h<12?"Доброе утро":h<18?"Добрый день":"Добрый вечер";
+  document.getElementById("greeting").textContent=gr;
+  document.getElementById("dash-name").textContent=user.name;
+  document.getElementById("nav-username").textContent=user.name;
+  const history=getHistory();
+  const last=history[history.length-1];
+  document.getElementById("dash-subtitle").textContent=last?`Последний тест: ${last.testTitle} — ${last.verdict}`:"Пройдите первый тест, чтобы узнать о себе больше.";
+  document.getElementById("stat-count").textContent=history.length;
+  document.getElementById("stat-mood").textContent=last?last.mood+"/10":"—/10";
+  renderMoodChart(history);
+}
+function renderMoodChart(history){
+  const days=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+  let data;
+  if(history.length===0){data=days.map(()=>Math.floor(Math.random()*3)+5)}
+  else{const last7=history.slice(-7);data=days.map((_,i)=>last7[i]?last7[i].mood:Math.floor(Math.random()*3)+5)}
+  const ctx=document.getElementById("moodChart").getContext("2d");
+  if(moodChart)moodChart.destroy();
+  moodChart=new Chart(ctx,{
+    type:"line",
+    data:{labels:days,datasets:[{label:"Настроение",data,borderColor:"#6366f1",backgroundColor:"rgba(99,102,241,0.1)",borderWidth:3,pointBackgroundColor:"#a855f7",pointBorderWidth:2,pointRadius:5,pointHoverRadius:7,fill:true,tension:0.4}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:10,grid:{color:"rgba(199,194,232,0.3)"},ticks:{color:"#9ca3af",font:{size:12}}},x:{grid:{color:"rgba(199,194,232,0.2)"},ticks:{color:"#9ca3af",font:{size:12}}}},plugins:{legend:{display:false}}}
+  });
+}
+// ===== TEST CATALOG =====
+let currentFilter = "";
+
+function renderTestCatalog(filter = "") {
+  currentFilter = filter.toLowerCase().trim();
+  const container = document.getElementById("test-cards");
+  const noResults = document.getElementById("no-results");
+
+  const filteredTests = tests.filter(t => 
+    t.title.toLowerCase().includes(currentFilter) || 
+    t.description.toLowerCase().includes(currentFilter)
+  );
+
+  if (filteredTests.length === 0) {
+    container.innerHTML = "";
+    noResults.classList.remove("hidden");
+    return;
+  }
+
+  noResults.classList.add("hidden");
+
+  container.innerHTML = filteredTests.map(t => `
+    <div class="glass p-6 text-left cursor-pointer hover:scale-[1.03] transition-all duration-300" onclick="startTest('${t.id}')">
+      <div class="text-5xl mb-4">${t.icon}</div>
+      <h3 class="font-bold text-lg mb-2" style="font-family:'Space Grotesk'">${t.title}</h3>
+      <p class="text-sm text-gray-500 leading-relaxed">${t.description}</p>
+      <div class="mt-4 flex items-center gap-2 text-sm font-medium" style="color:#6366f1">${t.questions.length} вопросов →</div>
+    </div>
+  `).join("");
+}
+// ===== TESTING =====
+function startTest(id){
+  currentTest=tests.find(t=>t.id===id);
+  currentQ=0;currentAnswers=[];
+  showScreen("testing");
+  renderQuestion();
+}
+function renderQuestion(){
+  const t=currentTest;
+  document.getElementById("test-title").textContent=t.icon+" "+t.title;
+  document.getElementById("test-progress-text").textContent=(currentQ+1)+"/"+t.questions.length;
+  document.getElementById("test-progress-bar").style.width=(currentQ/t.questions.length*100)+"%";
+  document.getElementById("test-question").textContent=t.questions[currentQ].text;
+  document.getElementById("test-answers").innerHTML=answerOptions.map(o=>`
+    <button class="answer-btn" onclick="handleAnswer(${o.value})">${o.label}</button>
+  `).join("");
+}
+function handleAnswer(val){
+  currentAnswers.push(val);
+  if(currentQ+1<currentTest.questions.length){currentQ++;renderQuestion()}
+  else{finishTest()}
+}
+// ===== ANALYSIS =====
+// ===== ANALYSIS =====
+function analyzeResult(testId, answers){
+  const test = tests.find(t => t.id === testId);
+  const total = answers.reduce((a, b) => a + b, 0);
+  const max = answers.length * 4;
+
+  if(testId === "eq"){
+    const cats = {};
+    test.questions.forEach((q, i) => {
+      const c = q.cat || "general";
+      if(!cats[c]) cats[c] = [];
+      cats[c].push(answers[i]);
+    });
+    const details = {};
+    Object.entries(cats).forEach(([k, v]) => {
+      details[k] = Math.round(v.reduce((a, b) => a + b, 0) / (v.length * 4) * 100);
+    });
+    const pct = total / max * 100;
+    let verdict, level, mood;
+    if(pct >= 80){ verdict = "Высокий EQ — Пик эмоциональной зрелости"; level = "low"; mood = 9; }
+    else if(pct >= 60){ verdict = "Хороший EQ — Стабильное эмоциональное состояние"; level = "moderate"; mood = 7; }
+    else if(pct >= 40){ verdict = "Средний EQ — Есть потенциал для роста"; level = "high"; mood = 5; }
+    else{ verdict = "Низкий EQ — Рекомендуется развитие навыков"; level = "critical"; mood = 3; }
+    return { testId, testTitle: test.title, totalScore: total, maxScore: max, verdict, level, details, mood };
+  }
+
+  if(testId === "hads"){
+    let anx = 0, dep = 0;
+    test.questions.forEach((q, i) => {
+      if(q.cat === "anxiety") anx += answers[i];
+      else dep += answers[i];
+    });
+    const t2 = anx + dep;
+    const mx = 56;
+    const details = { anxiety: anx, depression: dep };
+    let verdict, level, mood;
+    if(t2 <= 10){ verdict = "Норма — Эмоциональное состояние стабильно"; level = "low"; mood = 8; }
+    else if(t2 <= 18){ verdict = "Субклинический уровень — Лёгкая тревожность"; level = "moderate"; mood = 6; }
+    else if(t2 <= 28){ verdict = "Клинически выраженная тревога/депрессия"; level = "high"; mood = 4; }
+    else{ verdict = "Глубокое истощение — Рекомендуется помощь специалиста"; level = "critical"; mood = 2; }
+    return { testId, testTitle: test.title, totalScore: t2, maxScore: mx, verdict, level, details, mood };
+  }
+
+  if(testId === "sleep"){
+    const pct = total / max * 100;
+    let verdict, level, mood;
+    if(pct <= 20){ verdict = "Отличный сон — Высокое восстановление"; level = "low"; mood = 9; }
+    else if(pct <= 45){ verdict = "Удовлетворительный сон — Незначительные нарушения"; level = "moderate"; mood = 6; }
+    else if(pct <= 70){ verdict = "Нарушения сна — Средний уровень усталости"; level = "high"; mood = 4; }
+    else{ verdict = "Тяжёлые нарушения сна — Хроническое истощение"; level = "critical"; mood = 2; }
+    return { testId, testTitle: test.title, totalScore: total, maxScore: max, verdict, level, mood };
+  }
+
+  if (testId === "burnout") {
+    const exhaustion = answers.slice(0, 4).reduce((a, b) => a + b, 0);
+    const depersonalization = answers.slice(4, 8).reduce((a, b) => a + b, 0);
+    const accomplishment = answers.slice(8).reduce((a, b) => a + b, 0);
+
+    const totalScore = exhaustion + depersonalization + accomplishment;
+    const maxScore = answers.length * 4;
+    const pct = Math.round((totalScore / maxScore) * 100);
+
+    let verdict, level, mood;
+    if (pct <= 25) { 
+      verdict = "Низкий уровень выгорания — вы в хорошей форме"; 
+      level = "low"; 
+      mood = 9; 
+    }
+    else if (pct <= 50) { 
+      verdict = "Умеренное выгорание — пора уделить себе внимание"; 
+      level = "moderate"; 
+      mood = 6; 
+    }
+    else if (pct <= 75) { 
+      verdict = "Высокий уровень выгорания"; 
+      level = "high"; 
+      mood = 3; 
+    }
+    else { 
+      verdict = "Критическое выгорание — нужна срочная помощь"; 
+      level = "critical"; 
+      mood = 1; 
+    }
+
+    return {
+      testId,
+      testTitle: "Тест на выгорание (Burnout)",
+      totalScore,
+      maxScore,
+      verdict,
+      level,
+      mood,
+      details: {
+        exhaustion: Math.round(exhaustion / 16 * 100),
+        depersonalization: Math.round(depersonalization / 16 * 100),
+        accomplishment: Math.round(accomplishment / 20 * 100)
+      }
+    };
+  }
+
+  if (testId === "selfesteem") {
+    let score = 0;
+    answers.forEach((ans, i) => {
+      if (i === 2 || i === 4 || i === 7 || i === 8) {
+        score += (4 - ans);
+      } else {
+        score += ans;
+      }
+    });
+
+    const maxScore = 40;
+    let verdict, level, mood;
+    if (score >= 30) { 
+      verdict = "Высокая самооценка — вы уверены в себе"; 
+      level = "high"; 
+      mood = 9; 
+    }
+    else if (score >= 20) { 
+      verdict = "Средняя самооценка — есть над чем поработать"; 
+      level = "moderate"; 
+      mood = 6; 
+    }
+    else { 
+      verdict = "Низкая самооценка — важно работать над собой"; 
+      level = "low"; 
+      mood = 3; 
+    }
+
+    return {
+      testId,
+      testTitle: "Тест на самооценку (Розенберг)",
+      totalScore: score,
+      maxScore,
+      verdict,
+      level,
+      mood,
+      details: { score: score + "/40" }
+    };
+  }
+
+  if (testId === "distortions") {
+    const counts = {};
+    answers.forEach((val, i) => {
+      const cat = test.questions[i].cat;
+      if (!counts[cat]) counts[cat] = 0;
+      counts[cat] += val;
+    });
+
+    const totalScore = total;
+    const maxScore = max;
+    const pct = Math.round((totalScore / maxScore) * 100);
+
+    let verdict, level, mood;
+    if (pct <= 25) { verdict = "Низкий уровень искажений — мышление здоровое"; level = "low"; mood = 9; }
+    else if (pct <= 50) { verdict = "Умеренное количество искажений"; level = "moderate"; mood = 6; }
+    else if (pct <= 75) { verdict = "Высокий уровень когнитивных искажений"; level = "high"; mood = 3; }
+    else { verdict = "Очень высокий уровень — важно работать с мышлением"; level = "critical"; mood = 2; }
+
+    const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0,3);
+
+    return {
+      testId,
+      testTitle: "Когнитивные искажения",
+      totalScore,
+      maxScore,
+      verdict,
+      level,
+      mood,
+      details: Object.fromEntries(sorted.map(([k,v]) => [catNames[k] || k, Math.round(v/8*100) + "%"]))
+    };
+  }
+
+  // Если тест не найден
+  return { testId, testTitle: "Неизвестный тест", totalScore: 0, maxScore: 100, verdict: "Ошибка анализа", level: "moderate", mood: 5 };
+}
+async function finishTest() {
+  const result = analyzeResult(currentTest.id, currentAnswers);
+  result.date = new Date().toISOString();
+  saveResult(result);
+
+  // === ОТПРАВКА В БД (не блокируем отображение результатов!) ===
+  const user = getUser();
+  if (user && user.email) {
+    // Запускаем отправку в фоне, НЕ ждём её
+    fetch(`${SERVER_URL}/api/save-result`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 
+        'ngrok-skip-browser-warning': 'true'
+      },
+      body: JSON.stringify({
+        userEmail: user.email,
+        testTitle: result.testTitle,
+        totalScore: result.totalScore,
+        verdict: result.verdict,
+        mood: result.mood
+      })
+    })
+    .then(response => {
+      if (response.ok) console.log("✅ Данные успешно отправлены в SQL!");
+      else console.log("⚠️ Сервер вернул ошибку:", response.status);
+    })
+    .catch(e => {
+      console.log("⚠️ Сервер не ответил (работает только локально или проверь CORS)");
+    });
+  }
+
+  // === ВСЕГДА показываем результаты ===
+  renderResults(result);
+  showScreen("results");
+}
+// ===== RESULTS =====
+function renderResults(r){
+  const emojis={low:"🌟",moderate:"💛",high:"⚠️",critical:"🆘"};
+  document.getElementById("result-emoji").textContent=emojis[r.level];
+  document.getElementById("result-verdict").textContent=r.verdict;
+  document.getElementById("result-verdict").style.cssText=verdictColors[r.level];
+  const pct=Math.round(r.totalScore/r.maxScore*100);
+  document.getElementById("result-pct").textContent=pct+"%";
+  document.getElementById("result-score").textContent=r.totalScore+"/"+r.maxScore;
+  const circle=document.getElementById("result-circle");
+  circle.setAttribute("stroke",levelColors[r.level]);
+  setTimeout(()=>{circle.setAttribute("stroke-dasharray",`${pct*2.64} 264`)},100);
+  const detailsEl=document.getElementById("result-details");
+  if(r.details){
+    detailsEl.classList.remove("hidden");
+    detailsEl.innerHTML=Object.entries(r.details).map(([k,v])=>`
+      <div style="background:rgba(237,233,254,0.5);border-radius:0.75rem;padding:0.75rem">
+        <div class="text-gray-500" style="text-transform:capitalize">${catNames[k]||k}</div>
+        <div class="font-bold">${typeof v==="number"&&v<=100?v+"%":v}</div>
+      </div>
+    `).join("");
+  } else { detailsEl.classList.add("hidden") }
+  const advice=adviceDB[r.testId]?.[r.level]||[];
+  document.getElementById("result-advice").innerHTML=advice.map(a=>`
+    <div class="glass p-5 hover:scale-[1.03] transition-transform">
+      <div class="text-3xl mb-3">${a.icon}</div>
+      <h4 class="font-semibold mb-1">${a.title}</h4>
+      <p class="text-sm text-gray-500 leading-relaxed">${a.desc}</p>
+    </div>
+  `).join("");
+}
+// ===== ACCOUNT =====
+function renderAccount() {
+    const user = getUser();
+    if (!user) return;
+
+    const avatarEl = document.getElementById('account-avatar');
+    const savedAvatar = localStorage.getItem(`avatar_${user.email}`);
+
+    if (savedAvatar) {
+        avatarEl.style.backgroundImage = `url(${savedAvatar})`;
+        avatarEl.style.backgroundSize = 'cover';
+        avatarEl.style.backgroundPosition = 'center';
+        avatarEl.textContent = '';
+    } else {
+        avatarEl.style.backgroundImage = '';
+        avatarEl.textContent = user.name.charAt(0).toUpperCase();
+    }
+
+    document.getElementById("account-name").textContent = user.name;
+    document.getElementById("account-email").textContent = user.email;
+    document.getElementById("account-date").textContent = 
+        "Зарегистрирован: " + new Date(user.createdAt).toLocaleDateString("ru-RU");
+
+    // История тестов
+    const history = getHistory();
+    const list = document.getElementById("history-list");
+    if (history.length === 0) {
+        list.innerHTML = '<p class="text-gray-500 text-sm">Вы ещё не прошли ни одного теста.</p>';
+    } else {
+        list.innerHTML = history.slice().reverse().map(r => `
+            <div class="history-item">
+                <div>
+                    <div class="font-medium text-sm">${r.testTitle}</div>
+                    <div class="text-xs text-gray-400 mt-0.5">${new Date(r.date).toLocaleDateString("ru-RU")} • ${r.verdict}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span>${levelEmoji[r.level] || '🟢'}</span>
+                    <span class="text-sm font-semibold">${Math.round(r.totalScore / r.maxScore * 100)}%</span>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    // Загружаем историю консультаций
+    loadConsultationHistory();
+}
+// ===== LOGOUT =====
+function handleLogout(){
+    if(confirm("Выйти из аккаунта?")) {
+        localStorage.removeItem("mindmirror_user");
+        showAuthScreen();
+    }
+}
+// ===== SEARCH =====
+function setupSearch() {
+  const input = document.getElementById("search-input");
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+    renderTestCatalog(input.value);
+  });
+}
+
+// ===== INIT =====
+function enterApp(){
+    document.getElementById("screen-auth").classList.remove("active");
+    document.getElementById("main-wrapper").classList.remove("hidden");
+    loadUserProfile();
+    showScreen('dashboard');
+}
+
+function showAuthScreen(){
+    document.getElementById("screen-auth").classList.add("active");
+    document.getElementById("main-wrapper").classList.add("hidden");
+    switchAuthTab(0);   // по умолчанию открываем вкладку "Войти"
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ Страница загружена");
+
+    // Принудительно очищаем старые данные (для теста)
+    // localStorage.removeItem("mindmirror_user");   // ← раскомментируй если нужно
+
+    const user = getUser();
+    console.log("Пользователь в localStorage:", user);
+
+    if (user && user.email) {
+        console.log("→ Заходим в приложение");
+        enterApp();
+    } else {
+        console.log("→ Показываем экран авторизации");
+        showAuthScreen();
+    }
+
+    setupSearch();
+    initStarRating();
+});
+function switchAuthTab(tab) {
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+
+    if (tab === 0) {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+    } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        tabLogin.classList.remove('active');
+        tabRegister.classList.add('active');
+    }
+}
+async function handleContact(e) {
+    e.preventDefault();
+
+    const statusEl = document.getElementById('auth-message') || 
+                     document.createElement('p'); // fallback
+    statusEl.className = "text-center text-sm mt-4";
+
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = btn.textContent;
+
+    btn.disabled = true;
+    btn.textContent = 'Отправляем...';
+
+    const name = document.getElementById('support-name').value.trim();
+    const email = document.getElementById('support-email').value.trim();
+    const subject = document.getElementById('support-subject').value.trim();
+    const message = document.getElementById('support-message').value.trim();
+
+    if (!subject || !message) {
+        statusEl.innerHTML = '<span class="text-red-500">Пожалуйста, заполните тему и сообщение</span>';
+        btn.disabled = false;
+        btn.textContent = originalBtnText;
+        return false;
+    }
+
+    try {
+        const response = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ name, email, subject, message })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            statusEl.innerHTML = `<span class="text-green-600 font-medium">${data.message}</span>`;
+            e.target.reset(); // очищаем форму
+        } else {
+            statusEl.innerHTML = `<span class="text-red-500">${data.error || 'Ошибка при отправке'}</span>`;
+        }
+    } catch (err) {
+        console.error(err);
+        statusEl.innerHTML = `<span class="text-red-500">Не удалось подключиться к серверу</span>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = originalBtnText;
+    return false;
+}
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ПРОФИЛЯ ===
+let currentUserEmail = null;
+let currentUserName = null;
+let currentAvatarBase64 = null;
+
+// === ЗАГРУЗКА ДАННЫХ ПРОФИЛЯ ===
+async function loadUserProfile() {
+    const user = getUser();
+    if (!user || !user.email) return;
+
+    currentUserEmail = user.email;
+    currentUserName = user.name;
+
+    // Загружаем аватар
+    currentAvatarBase64 = localStorage.getItem(`avatar_${user.email}`) || null;
+
+    // Показываем аватар, если он есть
+    if (currentAvatarBase64) {
+        const avatarEl = document.getElementById('account-avatar');
+        avatarEl.style.backgroundImage = `url(${currentAvatarBase64})`;
+        avatarEl.style.backgroundSize = 'cover';
+        avatarEl.style.backgroundPosition = 'center';
+        avatarEl.textContent = '';
+    }
+}
+
+// === ФУНКЦИИ РЕДАКТИРОВАНИЯ ПРОФИЛЯ ===
+
+function triggerAvatarUpload() {
+    document.getElementById('edit-avatar').click();
+}
+
+async function editProfile() {
+    const user = getUser();
+    if (!user) return;
+
+    currentUserEmail = user.email;
+    currentUserName = user.name;
+
+    // Заполняем только имя
+    document.getElementById('edit-name').value = currentUserName || '';
+    document.getElementById('edit-avatar').value = ''; // сбрасываем файл
+
+    const modal = document.getElementById('modal-edit-profile');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('modal-edit-profile');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Файл слишком большой! Максимум 10 МБ.');
+            reject(new Error('File too large'));
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+        reader.readAsDataURL(file);
+    });
+}
+
+async function saveProfileChanges() {
+    const newName = document.getElementById('edit-name').value.trim();
+    const fileInput = document.getElementById('edit-avatar');
+    
+    let avatarBase64 = null;
+
+    if (fileInput.files && fileInput.files[0]) {
+        try {
+            avatarBase64 = await fileToBase64(fileInput.files[0]);
+        } catch (e) {
+            return;
+        }
+    }
+
+    try {
+        const res = await fetch('/api/profile', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: currentUserEmail,
+                name: newName || undefined,
+                avatar: avatarBase64 || undefined
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert('Профиль успешно обновлён!');
+
+            if (newName) {
+                currentUserName = newName;
+                const user = getUser();
+                if (user) {
+                    user.name = newName;
+                    saveUser(user);
+                }
+                document.getElementById('account-name').textContent = newName;
+            }
+
+            if (avatarBase64) {
+                currentAvatarBase64 = avatarBase64;
+                localStorage.setItem(`avatar_${currentUserEmail}`, avatarBase64);
+
+                const avatarEl = document.getElementById('account-avatar');
+                avatarEl.style.backgroundImage = `url(${avatarBase64})`;
+                avatarEl.style.backgroundSize = 'cover';
+                avatarEl.style.backgroundPosition = 'center';
+                avatarEl.textContent = '';
+            }
+
+            closeEditModal();
+            renderAccount();        // обновляем экран профиля
+
+        } else {
+            alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Ошибка соединения с сервером');
+    }
+}
+// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ОТЗЫВА ===
+let currentRating = 0;
+
+// Открытие модального окна отзыва
+function openFeedbackModal() {
+    currentRating = 0;
+    document.getElementById('feedback-comment').value = '';
+    updateStars(0);
+    
+    const modal = document.getElementById('modal-feedback');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+// Закрытие модального окна
+function closeFeedbackModal() {
+    const modal = document.getElementById('modal-feedback');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+// Обновление звёзд
+function updateStars(rating) {
+    currentRating = rating;
+    const stars = document.querySelectorAll('#star-rating span');
+    stars.forEach(star => {
+        const value = parseInt(star.getAttribute('data-value'));
+        star.textContent = value <= rating ? '★' : '☆';
+        star.style.color = value <= rating ? '#fbbf24' : '#d1d5db';
+    });
+}
+
+// Инициализация кликов по звёздам
+function initStarRating() {
+    const stars = document.querySelectorAll('#star-rating span');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const value = parseInt(star.getAttribute('data-value'));
+            updateStars(value);
+        });
+        
+        // Подсветка при наведении
+        star.addEventListener('mouseover', () => {
+            const value = parseInt(star.getAttribute('data-value'));
+            const allStars = document.querySelectorAll('#star-rating span');
+            allStars.forEach(s => {
+                const v = parseInt(s.getAttribute('data-value'));
+                s.textContent = v <= value ? '★' : '☆';
+                s.style.color = v <= value ? '#fbbf24' : '#d1d5db';
+            });
+        });
+        
+        star.addEventListener('mouseout', () => {
+            updateStars(currentRating);
+        });
+    });
+}
+
+// Отправка отзыва
+async function submitFeedback() {
+    if (currentRating === 0) {
+        alert('Пожалуйста, поставьте оценку от 1 до 5');
+        return;
+    }
+
+    const comment = document.getElementById('feedback-comment').value.trim();
+    const user = getUser();
+
+    if (!user || !user.email) {
+        alert('Вы должны быть авторизованы');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userEmail: user.email,
+                rating: currentRating,
+                comment: comment || null
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert('Спасибо за ваш отзыв! ❤️');
+            closeFeedbackModal();
+        } else {
+            alert('Ошибка: ' + (data.error || 'Не удалось отправить отзыв'));
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Ошибка соединения с сервером');
+    }
+}
+// ===== КОНСУЛЬТАЦИЯ =====
+async function handleBookConsultation(e) {
+  e.preventDefault();
+
+  const statusEl = document.getElementById('consult-status');
+  const btn = document.getElementById('consult-btn');
+  const user = getUser();
+
+  if (!user) {
+    statusEl.innerHTML = '<span class="text-red-500">Сначала войдите в аккаунт</span>';
+    return false;
+  }
+
+  const topic = document.getElementById('consult-topic').value.trim();
+  const preferredDate = document.getElementById('consult-date').value;
+  const notes = document.getElementById('consult-notes').value.trim();
+
+  statusEl.innerHTML = '';
+  btn.disabled = true;
+  btn.innerHTML = 'Отправляем...';
+
+  try {
+    const response = await fetch(`${SERVER_URL}/api/book-consultation`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      },
+      body: JSON.stringify({
+        userEmail: user.email,
+        topic,
+        preferredDate,
+        notes
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      statusEl.innerHTML = `<span class="text-green-600 font-medium">${data.message}</span>`;
+      // очищаем форму
+      document.getElementById('consultation-form').reset();
+      // обновляем историю в профиле
+      setTimeout(() => renderAccount(), 1500);
+    } else {
+      statusEl.innerHTML = `<span class="text-red-500">${data.error}</span>`;
+    }
+  } catch (err) {
+    statusEl.innerHTML = `<span class="text-red-500">Не удалось подключиться к серверу</span>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = 'Записаться на консультацию';
+  return false;
+}
+
+// Заполняем слоты (ближайшие 14 дней, удобное время)
+function generateConsultationSlots() {
+  const select = document.getElementById('consult-date');
+  if (!select) return;
+
+  const now = new Date();
+  const options = [];
+
+  for (let i = 1; i <= 14; i++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() + i);
+
+    // только будни
+    if (date.getDay() === 0 || date.getDay() === 6) continue;
+
+    const dayStr = date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+
+    // удобные часы 10:00, 12:00, 14:00, 16:00, 18:00
+    [10,12,14,16,18].forEach(hour => {
+      const slot = new Date(date);
+      slot.setHours(hour, 0, 0, 0);
+      options.push({
+        value: slot.toISOString(),
+        text: `${dayStr} • ${hour}:00`
+      });
+    });
+  }
+
+  select.innerHTML = `<option value="">Выберите удобное время...</option>` +
+    options.map(o => `<option value="${o.value}">${o.text}</option>`).join('');
+}
+
+// generateConsultationSlots вызывается напрямую из showScreen
+
+// ====================== ОТМЕНА КОНСУЛЬТАЦИИ ======================
+async function cancelConsultation(id) {
+    if (!confirm('Вы уверены, что хотите отменить эту консультацию?')) return;
+
+    const user = getUser();
+    if (!user) return;
+
+    try {
+        const response = await fetch(`${SERVER_URL}/api/cancel-consultation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ id, userEmail: user.email })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            await loadConsultationHistory();
+        } else {
+            alert(data.error || 'Не удалось отменить консультацию');
+        }
+    } catch (err) {
+        alert('Не удалось подключиться к серверу');
+        console.error(err);
+    }
+}
+let gratitudeList = [];
+
+// Показать экран сада
+function showGarden() {
+    showScreen('garden');
+    resetGarden();
+}
+
+// Сброс игры
+function resetGarden() {
+    gratitudeList = [];
+    document.getElementById('garden-stage-1').classList.remove('hidden');
+    document.getElementById('garden-stage-2').classList.add('hidden');
+    document.getElementById('garden-stage-3').classList.add('hidden');
+
+    // Создаём 5 полей ввода
+    const container = document.getElementById('gratitude-inputs');
+    container.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const div = document.createElement('div');
+        div.className = "flex gap-3";
+        div.innerHTML = `
+            <div class="w-8 h-8 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold flex-shrink-0">${i}</div>
+            <input type="text" id="gratitude-${i}" 
+                   class="flex-1 px-5 py-4 rounded-3xl border border-purple-100 focus:border-purple-400 outline-none" 
+                   placeholder="Например: тёплое солнце утром...">
+        `;
+        container.appendChild(div);
+    }
+}
+
+// Посадить семена
+function plantSeeds() {
+    gratitudeList = [];
+    for (let i = 1; i <= 5; i++) {
+        const val = document.getElementById(`gratitude-${i}`).value.trim();
+        if (val) gratitudeList.push(val);
+    }
+
+    if (gratitudeList.length === 0) {
+        alert("Напиши хотя бы одну вещь, за которую ты благодарен ❤️");
+        return;
+    }
+
+    document.getElementById('garden-stage-1').classList.add('hidden');
+    document.getElementById('garden-stage-2').classList.remove('hidden');
+
+    growGarden();
+}
+
+// Анимация роста
+function growGarden() {
+    const canvas = document.getElementById('garden-canvas');
+    const ctx = canvas.getContext('2d');
+    let progress = 0;
+
+    const interval = setInterval(() => {
+        progress += 2;
+        drawGrowingGarden(ctx, progress);
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                document.getElementById('garden-stage-2').classList.add('hidden');
+                document.getElementById('garden-stage-3').classList.remove('hidden');
+                drawFinalGarden(document.getElementById('final-garden-canvas').getContext('2d'));
+            }, 800);
+        }
+    }, 30);
+}
+
+// Рисование растущего сада
+function drawGrowingGarden(ctx, progress) {
+    ctx.clearRect(0, 0, 700, 420);
+    
+    // Небо и земля
+    const grad = ctx.createLinearGradient(0, 0, 0, 420);
+    grad.addColorStop(0, "#bae6fd");
+    grad.addColorStop(1, "#86efac");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 700, 420);
+
+    // Земля
+    ctx.fillStyle = "#4d7c0f";
+    ctx.fillRect(0, 320, 700, 100);
+
+    const count = Math.min(gratitudeList.length, 5);
+    for (let i = 0; i < count; i++) {
+        const x = 120 + i * 110;
+        const growth = Math.min(progress / 100, 1);
+        
+        // Стебель
+        ctx.strokeStyle = "#166534";
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(x, 320);
+        ctx.quadraticCurveTo(x-15, 280, x, 320 - 180 * growth);
+        ctx.stroke();
+
+        // Цветок
+        if (growth > 0.6) {
+            const flowerSize = (growth - 0.6) * 2.5;
+            drawFlower(ctx, x, 320 - 180 * growth, flowerSize, i);
+        }
+    }
+}
+
+// Рисование цветка
+function drawFlower(ctx, x, y, size, seedIndex) {
+    const colors = ["#f472b6", "#a78bfa", "#60a5fa", "#facc15", "#34d399"];
+    ctx.fillStyle = colors[seedIndex % colors.length];
+    
+    for (let a = 0; a < 8; a++) {
+        const angle = (a * Math.PI) / 4;
+        const px = x + Math.cos(angle) * 22 * size;
+        const py = y + Math.sin(angle) * 22 * size;
+        
+        ctx.beginPath();
+        ctx.ellipse(px, py, 18*size, 10*size, angle, 0, Math.PI*2);
+        ctx.fill();
+    }
+    
+    // Сердцевина
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(x, y, 12*size, 0, Math.PI*2);
+    ctx.fill();
+}
+
+// Финальный сад (красивый и статичный)
+function drawFinalGarden(ctx) {
+    ctx.clearRect(0, 0, 700, 420);
+    
+    const grad = ctx.createLinearGradient(0, 0, 0, 420);
+    grad.addColorStop(0, "#bae6fd");
+    grad.addColorStop(1, "#86efac");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 700, 420);
+
+    ctx.fillStyle = "#4d7c0f";
+    ctx.fillRect(0, 320, 700, 100);
+
+    const count = Math.min(gratitudeList.length, 5);
+    for (let i = 0; i < count; i++) {
+        const x = 120 + i * 110;
+        drawFlower(ctx, x, 140, 1.1, i);
+        
+        // Подпись
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.font = "500 14px Outfit";
+        ctx.textAlign = "center";
+        ctx.fillText(gratitudeList[i].length > 25 ? gratitudeList[i].substring(0,22)+"..." : gratitudeList[i], x, 380);
+    }
+
+    // Солнышко
+    ctx.fillStyle = "#fbbf24";
+    ctx.beginPath();
+    ctx.arc(580, 80, 45, 0, Math.PI*2);
+    ctx.fill();
+}
+
+// Сохранить как изображение
+function downloadGarden() {
+    const canvas = document.getElementById('final-garden-canvas');
+    const link = document.createElement('a');
+    link.download = 'Мой_Сад_Благодарности.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+function exitGarden() {
+    showScreen('games'); // или 'dashboard'
+}
+
+function restartGarden() {
+    resetGarden();
+}
+
+// ====================== КАТАЛОГ МИНИ-ИГР ======================
+const miniGames = [
+  {
+    id: "garden",
+    title: "Сад Благодарности",
+    description: "Посади 3–5 вещей, за которые ты благодарен сегодня и наблюдай, как растёт твой сад",
+    icon: "🌸",
+    color: "from-amber-400 to-pink-500"
+  },
+  {
+    id: "breathing",
+    title: "Круг Спокойствия",
+    description: "Техника 4-7-8 дыхания для мгновенного успокоения",
+    icon: "🌬️",
+    color: "from-purple-400 to-indigo-500"
+  },
+  {
+    id: "bubbles",
+    title: "Пузыри Стресса",
+    description: "Лопай негативные мысли и превращай их в позитив",
+    icon: "🫧",
+    color: "from-pink-400 to-rose-500"
+  }
+];
+
+function renderGamesCatalog() {
+  const container = document.getElementById("games-grid");
+  if (!container) return;
+
+  container.innerHTML = miniGames.map(game => `
+    <div onclick="startMiniGame('${game.id}')" 
+         class="glass p-6 cursor-pointer hover:scale-[1.03] transition-all duration-300 group">
+      <div class="text-6xl mb-4 transition-transform group-hover:rotate-12">${game.icon}</div>
+      <h3 class="font-bold text-xl mb-2 group-hover:text-purple-600 transition-colors">${game.title}</h3>
+      <p class="text-sm text-gray-500 leading-relaxed">${game.description}</p>
+      <div class="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-purple-500">
+        ИГРАТЬ →
+      </div>
+    </div>
+  `).join("");
+}
+
+function startMiniGame(id) {
+  if (id === "garden") showGarden();
+  else if (id === "breathing") showBreathing();
+  else if (id === "bubbles") showBubbles();
+}
+// ====================== КРУГ СПОКОЙСТВИЯ (исправленная версия) ======================
+let breathingInterval = null;
+let isBreathing = false;
+
+function showBreathing() {
+  showScreen('breathing');
+  resetBreathing();
+}
+
+function resetBreathing() {
+  clearInterval(breathingInterval);
+  isBreathing = false;
+  document.getElementById('breathing-complete').classList.add('hidden');
+  document.getElementById('start-breathing-btn').textContent = 'Начать дыхание';
+  document.getElementById('breathing-instruction').textContent = 'Готовы?';
+  document.getElementById('breathing-count').textContent = '';
+  document.getElementById('breathing-circle').style.transform = 'scale(1)';
+  document.getElementById('breathing-circle').style.borderColor = '#c4b5fd';
+}
+
+function startBreathing() {
+  if (isBreathing) return;
+  
+  isBreathing = true;
+  const circle = document.getElementById('breathing-circle');
+  const instruction = document.getElementById('breathing-instruction');
+  const countEl = document.getElementById('breathing-count');
+
+  document.getElementById('start-breathing-btn').textContent = 'Дышим...';
+
+  let phase = 0; // 0 = вдох, 1 = задержка, 2 = выдох, 3 = задержка
+
+  function nextPhase() {
+    phase = (phase + 1) % 4;
+
+    if (phase === 0) { // ВДОХ — 4 секунды
+      instruction.textContent = "Вдох...";
+      countEl.textContent = "4";
+      circle.style.transform = "scale(1.4)";
+      circle.style.borderColor = "#a855f7";
+      setTimeout(nextPhase, 4000);
+    } 
+    else if (phase === 1) { // ЗАДЕРЖКА — 7 секунд
+      instruction.textContent = "Задержи дыхание";
+      countEl.textContent = "7";
+      setTimeout(nextPhase, 7000);
+    } 
+    else if (phase === 2) { // ВЫДОХ — 8 секунд
+      instruction.textContent = "Медленный выдох...";
+      countEl.textContent = "8";
+      circle.style.transform = "scale(0.85)";
+      circle.style.borderColor = "#6366f1";
+      setTimeout(nextPhase, 8000);
+    } 
+    else if (phase === 3) { // Короткая задержка — 4 секунды
+      instruction.textContent = "Задержи";
+      countEl.textContent = "4";
+      setTimeout(nextPhase, 4000);
+    }
+  }
+
+  nextPhase(); // запускаем первый цикл
+}
+
+function exitBreathing() {
+  clearInterval(breathingInterval); // на всякий случай
+  showScreen('games');
+}
+
+function restartBreathing() {
+  resetBreathing();
+  setTimeout(startBreathing, 300);
+}
+// ====================== ПУЗЫРИ СТРЕССА (исправленная версия) ======================
+let bubbles = [];
+let poppedCount = 0;
+let bubblesInterval = null;
+let isBubblesPlaying = false;
+let bubblesCanvasListener = null;
+
+const negativeThoughts = [
+  "Я неудачник", "Всё плохо", "Я не справлюсь", "Меня никто не любит",
+  "Я устал", "Ничего не получится", "Я слишком слаб", "Это конец",
+  "Я боюсь", "Мне стыдно", "Я не достоин"
+];
+
+function showBubbles() {
+  showScreen('bubbles');
+  resetBubbles();
+}
+
+function resetBubbles() {
+  if (bubblesInterval) clearInterval(bubblesInterval);
+  if (bubblesCanvasListener) {
+    document.getElementById('bubbles-canvas').removeEventListener('click', bubblesCanvasListener);
+    bubblesCanvasListener = null;
+  }
+
+  bubbles = [];
+  poppedCount = 0;
+  isBubblesPlaying = false;
+
+  document.getElementById('bubbles-complete').classList.add('hidden');
+  document.getElementById('start-bubbles-btn').textContent = 'Начать сеанс';
+  document.getElementById('bubbles-popped').textContent = '0';
+}
+
+function startBubblesGame() {
+  resetBubbles();
+  isBubblesPlaying = true;
+  document.getElementById('start-bubbles-btn').textContent = 'Игра идёт...';
+
+  const canvas = document.getElementById('bubbles-canvas');
+  const ctx = canvas.getContext('2d');
+
+  bubbles = [];
+  for (let i = 0; i < 15; i++) {
+    bubbles.push({
+      x: 80 + Math.random() * 540,
+      y: 60 + Math.random() * 280,
+      radius: 26 + Math.random() * 18,
+      vx: (Math.random() - 0.5) * 2.8,
+      vy: (Math.random() - 0.5) * 2.2 - 1.2,   // ← медленнее
+      text: negativeThoughts[Math.floor(Math.random() * negativeThoughts.length)],
+      popped: false
+    });
+  }
+
+  // Новый слушатель кликов
+  bubblesCanvasListener = function(e) {
+    if (!isBubblesPlaying) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    bubbles.forEach(bubble => {
+      if (bubble.popped) return;
+      const dist = Math.hypot(bubble.x - clickX, bubble.y - clickY);
+      if (dist < bubble.radius + 18) {
+        bubble.popped = true;
+        poppedCount++;
+        document.getElementById('bubbles-popped').textContent = poppedCount;
+        createPopEffect(bubble.x, bubble.y);
+      }
+    });
+
+    if (poppedCount >= 12) {
+      clearInterval(bubblesInterval);
+      document.getElementById('bubbles-complete').classList.remove('hidden');
+    }
+  };
+
+  canvas.addEventListener('click', bubblesCanvasListener);
+
+  bubblesInterval = setInterval(() => updateBubbles(ctx), 1000/60);
+}
+
+function updateBubbles(ctx) {
+  ctx.clearRect(0, 0, 700, 480);
+  ctx.fillStyle = "#f3e8ff";
+  ctx.fillRect(0, 0, 700, 480);
+
+  let remaining = 0;
+
+  bubbles.forEach((bubble, i) => {
+    if (bubble.popped) return;
+    remaining++;
+
+    // Движение (сделали медленнее)
+    bubble.x += bubble.vx;
+    bubble.y += bubble.vy;
+    bubble.vy += 0.008;        // ← уменьшил гравитацию
+
+    // Отскоки
+    if (bubble.x - bubble.radius < 30 || bubble.x + bubble.radius > 670) bubble.vx *= -0.92;
+    if (bubble.y - bubble.radius < 40) bubble.vy *= -0.88;
+
+    // Рисуем пузырь
+    ctx.save();
+    ctx.shadowColor = "#c4b5fd";
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${275 + i*8}, 80%, 88%, 0.92)`;
+    ctx.fill();
+    ctx.strokeStyle = "#a5b4fc";
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Текст
+    ctx.fillStyle = "#4c1d95";
+    ctx.font = "600 13.5px Outfit";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(bubble.text, bubble.x, bubble.y);
+  });
+
+  if (remaining === 0) {
+    clearInterval(bubblesInterval);
+    document.getElementById('bubbles-complete').classList.remove('hidden');
+  }
+}
+
+function createPopEffect(x, y) {
+  const canvas = document.getElementById('bubbles-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = "rgba(167, 139, 250, 0.75)";
+  ctx.beginPath();
+  ctx.arc(x, y, 38, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function exitBubbles() {
+  resetBubbles();
+  showScreen('games');
+}
+
+function restartBubbles() {
+  resetBubbles();
+  setTimeout(startBubblesGame, 180);
+}
+// ====================== PREMIUM ======================
+function showPremiumScreen() {
+  showScreen('premium');
+}
+
+function showPaymentModal() {
+  document.getElementById('modal-payment').classList.remove('hidden');
+  document.getElementById('modal-payment').classList.add('flex');
+}
+
+function closePaymentModal() {
+  document.getElementById('modal-payment').classList.add('hidden');
+  document.getElementById('modal-payment').classList.remove('flex');
+}
+
+async function processPayment() {
+  const user = getUser();
+  if (!user) {
+    alert("Сначала войдите в аккаунт");
+    return;
+  }
+
+  // Симуляция оплаты
+  const cardNumber = document.getElementById('card-number').value.trim();
+  if (!cardNumber) {
+    alert("Введите номер карты");
+    return;
+  }
+
+  const last4 = cardNumber.slice(-4) || "4242";
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+      body: JSON.stringify({
+        email: user.email,
+        plan: 'monthly',
+        amount: 990,
+        cardLast4: last4
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("🎉 Поздравляем! Подписка Premium активирована на 30 дней!");
+      closePaymentModal();
+      showScreen('dashboard');
+    } else {
+      alert("Ошибка: " + (data.error || "Не удалось активировать подписку"));
+    }
+  } catch (e) {
+    alert("✅ В демо-режиме подписка активирована!");
+    closePaymentModal();
+    showScreen('dashboard');
+  }
+}
+// ====================== PREMIUM ОГРАНИЧЕНИЯ ======================
+
+// Проверка статуса Premium
+async function isUserPremium() {
+  const user = getUser();
+  if (!user || !user.email) return false;
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/subscription/status?email=${encodeURIComponent(user.email)}`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
+    const data = await res.json();
+    return data.success && data.isPremium;
+  } catch (e) {
+    // fallback на localStorage для демо
+    return localStorage.getItem(`premium_${user.email}`) === 'true';
+  }
+}
+
+// Проверка доступа к функции
+async function checkPremiumAccess(feature) {
+  const isPremium = await isUserPremium();
+  if (isPremium) return true;
+
+  let message = "";
+
+  switch(feature) {
+    case "test":
+      message = "Вы уже прошли 3 теста на этой неделе.\n\nПремиум даёт неограниченное количество тестов!";
+      break;
+    case "ai":
+      message = "Лимит сообщений MindMirror AI исчерпан на сегодня.\n\nВ Premium — безлимитный AI";
+      break;
+    case "game":
+      message = "Вы уже использовали лимит игр на сегодня.\n\nВ Premium — неограниченный доступ ко всем играм";
+      break;
+    default:
+      message = "Эта функция доступна только в Premium";
+  }
+
+  if (confirm(message + "\n\nПерейти к Premium?")) {
+    showScreen('premium');
+  }
+  return false;
+}
+
+// ====================== ОГРАНИЧЕНИЯ ТЕСТОВ ======================
+let weeklyTestsCount = 0;
+
+async function canStartTest() {
+  const isPremium = await isUserPremium();
+  if (isPremium) return true;
+
+  // Простой счётчик на неделю (в localStorage)
+  const today = new Date().toISOString().slice(0,10);
+  const saved = JSON.parse(localStorage.getItem('weeklyTests') || '{}');
+  
+  if (saved.date !== today) {
+    saved.count = 0;
+    saved.date = today;
+  }
+
+  if (saved.count >= 3) {
+    checkPremiumAccess('test');
+    return false;
+  }
+
+  saved.count++;
+  localStorage.setItem('weeklyTests', JSON.stringify(saved));
+  return true;
+}
+
+// Перехватываем запуск теста
+const originalStartTest = window.startTest || function(){};
+window.startTest = async function(testId) {
+  if (await canStartTest()) {
+    originalStartTest(testId);
+  }
+};
+
+
+
+// ====================== ОГРАНИЧЕНИЯ МИНИ-ИГР ======================
+const gameDailyLimit = 2;
+const gameUsage = {};
+
+async function startMiniGame(id) {
+  const isPremium = await isUserPremium();
+  if (!isPremium) {
+    const today = new Date().toISOString().slice(0,10);
+    if (!gameUsage[today]) gameUsage[today] = {};
+    if (!gameUsage[today][id]) gameUsage[today][id] = 0;
+
+    if (gameUsage[today][id] >= gameDailyLimit) {
+      checkPremiumAccess('game');
+      return;
+    }
+    gameUsage[today][id]++;
+  }
+
+  // Запускаем игру
+  if (id === "garden") showGarden();
+  else if (id === "breathing") showBreathing();
+  else if (id === "bubbles") showBubbles();
+}
+
+
+// ====================== ОТМЕНА ПОДПИСКИ ======================
+async function cancelSubscription() {
+  const user = getUser();
+  if (!user) {
+    alert("Вы не авторизованы");
+    return;
+  }
+
+  if (!confirm("Вы уверены, что хотите отменить Premium-подписку?\n\nПодписка будет активна до конца оплаченного периода.")) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/subscription/cancel`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true'
+      },
+      body: JSON.stringify({ email: user.email })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("✅ Подписка успешно отменена.\n\nВы сможете пользоваться Premium до конца оплаченного периода.");
+      showScreen('premium'); // обновляем экран
+    } else {
+      alert("Ошибка: " + (data.error || "Не удалось отменить подписку"));
+    }
+  } catch (e) {
+    alert("❌ Ошибка соединения с сервером");
+    console.error(e);
+  }
+};
+// ====================== ТЕХПОДДЕРЖКА ======================
+async function handleBookConsultation(e) {
+  e.preventDefault();
+  const user = getUser();
+  if (!user) return alert("Войдите в аккаунт");
+
+  const topic = document.getElementById('consult-topic').value;
+  const preferredDate = document.getElementById('consult-date').value;
+  const notes = document.getElementById('consult-notes').value.trim();
+
+  if (!topic || !preferredDate) {
+    alert("Выберите тему и дату/время");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/book-consultation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: user.email, topic, preferredDate, notes })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert(data.message || "Заявка отправлена! Психолог свяжется с вами ❤️");
+      e.target.reset();
+      loadConsultationHistory();
+    } else {
+      alert("Ошибка: " + (data.error || "Не удалось записаться"));
+    }
+  } catch (err) {
+    alert("Ошибка соединения с сервером");
+  }
+}
+
+async function loadConsultationHistory() {
+  const user = getUser();
+  if (!user) return;
+  const container = document.getElementById('consultation-history');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/consultations?email=${encodeURIComponent(user.email)}`);
+    const data = await res.json();
+
+    if (!data.success || data.consultations.length === 0) {
+      container.innerHTML = `<p class="text-gray-500 text-center py-12">У вас пока нет записей на консультации</p>`;
+      return;
+    }
+
+    let html = '';
+    data.consultations.forEach(c => {
+      const dateStr = new Date(c.PreferredDate).toLocaleString('ru-RU');
+      html += `
+        <div class="glass p-6 rounded-3xl flex justify-between items-start">
+          <div>
+            <div class="font-medium">${c.Topic}</div>
+            <div class="text-sm text-gray-500">${dateStr}</div>
+            ${c.Notes ? `<p class="text-xs text-gray-400 mt-2">${c.Notes}</p>` : ''}
+          </div>
+          <div class="text-right">
+            <span class="px-3 py-1 text-xs rounded-2xl ${c.Status === 'cancelled' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}">
+              ${c.Status === 'cancelled' ? 'Отменена' : 'Ожидает'}
+            </span>
+            ${c.Status !== 'cancelled' ? `<button onclick="cancelConsultation(${c.Id})" class="text-red-500 text-xs mt-3 block">Отменить</button>` : ''}
+          </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<p class="text-red-500">Не удалось загрузить историю</p>`;
+  }
+}
+
+async function cancelConsultation(id) {
+  if (!confirm("Отменить эту консультацию?")) return;
+  const user = getUser();
+  if (!user) return;
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/cancel-consultation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, userEmail: user.email })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert("Консультация отменена");
+      loadConsultationHistory();
+    } else {
+      alert(data.error || "Не удалось отменить");
+    }
+  } catch (err) {
+    alert("Ошибка соединения");
+  }
+}
+
+// ====================== ЕДИНСТВЕННАЯ showScreen ======================
+function showScreen(id) {
+    console.log('→ Открываем экран:', id);
+
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    const screen = document.getElementById("screen-" + id);
+    
+    if (screen) {
+        screen.classList.add("active");
+    } else {
+        console.error("Экран не найден:", id);
+        return;
+    }
+
+    // Подсветка меню
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.id === "nav-" + id) btn.classList.add("active");
+    });
+
+    // Действия при открытии экранов
+    if (id === "dashboard") renderDashboard();
+    if (id === "tests") renderTestCatalog();
+    if (id === "account") renderAccount();
+    if (id === "ai") renderAIChat();
+    if (id === "games") renderGamesCatalog();
+    
+    if (id === "support") {
+        const user = getUser();
+        if (user) {
+            document.getElementById("support-name").value = user.name || '';
+            document.getElementById("support-email").value = user.email || '';
+        }
+    }
+    if (id === "consultation") {
+        generateConsultationSlots();
+        if (typeof loadConsultationHistory === "function") loadConsultationHistory();
+    }
+}
+
+// ====================== ИНИЦИАЛИЗАЦИЯ ======================
+window.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ MindMirror загружен");
+    const user = getUser();
+    if (user && user.email) {
+        enterApp();
+    } else {
+        showAuthScreen();
+    }
+
+    setupSearch();
+    initStarRating();
+    renderGamesCatalog();
+});
+// ====================== MINDMIRROR AI — РАБОЧАЯ ВЕРСИЯ ======================
+let aiHistory = [];
+
+function renderAIChat() {
+  const welcome = document.getElementById('ai-welcome');
+  const messages = document.getElementById('ai-messages');
+  if (welcome) welcome.style.display = 'flex';
+  if (messages) messages.classList.add('hidden');
+  aiHistory = [];
+}
+
+async function sendAIMessage() {
+  const input = document.getElementById('ai-input');
+  const messageText = input.value.trim();
+  if (!messageText) return;
+
+  const messagesContainer = document.getElementById('ai-messages');
+  const welcome = document.getElementById('ai-welcome');
+
+  // Прячем приветствие, показываем чат
+  if (welcome) welcome.style.display = 'none';
+  if (messagesContainer) messagesContainer.classList.remove('hidden');
+
+  // Сообщение пользователя
+  messagesContainer.innerHTML += `
+    <div class="flex justify-end mb-6">
+      <div class="max-w-[70%] bg-purple-600 text-white px-6 py-4 rounded-3xl rounded-tr-none">
+        ${messageText}
+      </div>
+    </div>`;
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+  const userMessage = messageText;
+  input.value = '';
+  aiHistory.push({ role: 'user', content: userMessage });
+
+  // "Думает..."
+  const loadingId = 'loading-' + Date.now();
+  messagesContainer.innerHTML += `
+    <div id="${loadingId}" class="flex gap-4 mb-6">
+      <div class="text-4xl">🪞</div>
+      <div class="bg-white px-6 py-4 rounded-3xl rounded-tl-none">думает...</div>
+    </div>`;
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+  try {
+    const res = await fetch(`${SERVER_URL}/api/ai-chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMessage, history: aiHistory })
+    });
+
+    const data = await res.json();
+
+    document.getElementById(loadingId).remove();
+
+    messagesContainer.innerHTML += `
+      <div class="flex gap-4 mb-6">
+        <div class="text-4xl flex-shrink-0">🪞</div>
+        <div class="max-w-[75%] bg-white px-6 py-4 rounded-3xl rounded-tl-none leading-relaxed whitespace-pre-wrap">
+          ${data.response || 'Я не смог ответить сейчас...'}
+        </div>
+      </div>`;
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    aiHistory.push({ role: 'assistant', content: data.response });
+
+  } catch (err) {
+    console.error(err);
+    const loadingEl = document.getElementById(loadingId);
+    if (loadingEl) loadingEl.remove();
+    messagesContainer.innerHTML += `<div class="text-red-500 px-4">❌ Не удалось подключиться к ИИ. Убедись, что server.js запущен.</div>`;
+  }
+}
+
+function quickAIMessage(text) {
+  const input = document.getElementById('ai-input');
+  if (input) {
+    input.value = text;
+    sendAIMessage();
+  }
+}
+// ====================== МОБИЛЬНОЕ МЕНЮ ======================
+let sidebarOpen = false;
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  
+  sidebarOpen = !sidebarOpen;
+  
+  if (sidebarOpen) {
+    sidebar.classList.remove('-translate-x-full');
+    overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  } else {
+    sidebar.classList.add('-translate-x-full');
+    overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+}
+
+// Закрывать меню при переходе на другой экран (на мобильных)
+const originalShowScreen = window.showScreen || showScreen;
+window.showScreen = function(id) {
+  originalShowScreen(id);
+  if (window.innerWidth < 768) {  // md breakpoint
+    toggleSidebar(); // закрываем меню после выбора
+  }
+};
+
+// Инициализация гамбургера
+window.addEventListener("DOMContentLoaded", () => {
+  const hamburger = document.getElementById('hamburger-btn');
+  if (hamburger) {
+    hamburger.addEventListener('click', toggleSidebar);
+  }
+  
+  // Закрывать при нажатии Esc
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebarOpen) toggleSidebar();
+  });
+});
+</script>
+<!-- МОДАЛЬНОЕ ОКНО ОПЛАТЫ PREMIUM -->
+<div id="modal-payment" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[100]">
+  <div class="glass max-w-md w-full mx-4 p-8 rounded-3xl">
+    <h2 class="text-2xl font-bold mb-6 text-center">Оформление Premium</h2>
+    
+    <div class="bg-white/70 p-6 rounded-2xl mb-6">
+      <p class="text-center text-lg font-medium">990 ₸ / месяц</p>
+    </div>
+
+    <div class="space-y-5">
+      <div>
+        <label class="block text-sm font-medium mb-2">Номер карты</label>
+        <input id="card-number" type="text" maxlength="19" placeholder="4242 4242 4242 4242" 
+               class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-purple-500 outline-none text-lg">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Срок действия</label>
+          <input id="card-expiry" type="text" maxlength="5" placeholder="12/28" 
+                 class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-purple-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">CVC</label>
+          <input id="card-cvc" type="text" maxlength="3" placeholder="123" 
+                 class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-purple-500 outline-none">
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-8">
+      <button onclick="closePaymentModal()" 
+              class="flex-1 py-4 rounded-2xl border border-gray-300 hover:bg-gray-100">Отмена</button>
+      <button onclick="processPayment()" 
+              class="flex-1 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold">
+        Оплатить 990 ₸
+      </button>
+    </div>
+    <p class="text-center text-xs text-gray-500 mt-6">Данные карты защищены • Тестовый режим</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindMirror — Аналитика</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #dbeafe, #f3e8ff);
+      min-height: 100vh;
+      color: #1e1b4b;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+    .glass {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px rgba(99,102,241,0.15);
+    }
+  </style>
+</head>
+<body class="p-6 md:p-10">
+
+<div class="max-w-6xl mx-auto">
+  <div class="flex items-center justify-between mb-10">
+    <div class="flex items-center gap-4">
+      <div class="text-5xl">🪞</div>
+      <div>
+        <h1 class="text-4xl font-bold gradient-text">MindMirror</h1>
+        <p class="text-gray-500 text-lg">Полная аналитика</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопки -->
+  <div class="flex flex-wrap gap-4 mb-8">
+    <button onclick="loadAllFeedback()" class="px-8 py-4 bg-white hover:bg-indigo-50 text-indigo-700 rounded-3xl font-medium flex items-center gap-3">
+      📋 Все отзывы
+    </button>
+    <button onclick="loadSubscriptionStats()" class="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-3xl font-semibold flex items-center gap-3">
+      ✨ Статистика подписок
+    </button>
+    <button onclick="analyzeWithAI()" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-semibold flex items-center gap-3">
+      🤖 Анализ отзывов ИИ
+    </button>
+    <button onclick="loadVisitStats()" class="px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-3xl font-semibold flex items-center gap-3">
+      📊 Посещения
+    </button>
+  </div>
+
+  <!-- Статистика подписок -->
+  <div id="subscription-stats" class="hidden mb-10">
+    <div class="glass p-8">
+      <h2 class="text-2xl font-bold mb-6">✨ Статистика Premium-подписок</h2>
+      <div id="sub-stats-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"></div>
+      <h3 class="text-xl font-semibold mb-4">Последние подписки</h3>
+      <div id="recent-subscriptions" class="space-y-4 max-h-[420px] overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- Статистика отзывов -->
+  <div id="stats" class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10"></div>
+
+  <!-- Список отзывов -->
+  <div class="glass p-8 mb-10">
+    <h2 class="text-2xl font-semibold mb-6">📝 Все отзывы</h2>
+    <div id="feedback-list" class="space-y-6 max-h-[520px] overflow-y-auto"></div>
+  </div>
+
+  <!-- AI анализ -->
+  <div id="ai-result" class="hidden">
+    <div class="glass p-8">
+      <h2 class="text-2xl font-bold mb-6">🤖 Анализ отзывов ИИ</h2>
+      <div id="ai-content" class="prose prose-indigo"></div>
+    </div>
+  </div>
+
+  <!-- Статистика посещений -->
+  <div id="visit-stats" class="hidden">
+    <div class="glass p-8">
+      <h2 class="text-2xl font-bold mb-6">📊 Статистика посещений</h2>
+      <div id="stats-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SERVER_URL = 'http://localhost:3000';
+
+async function loadSubscriptionStats() {
+  document.getElementById('subscription-stats').classList.remove('hidden');
+  const grid = document.getElementById('sub-stats-grid');
+  const recent = document.getElementById('recent-subscriptions');
+
+  try {
+    const [statsRes, recentRes] = await Promise.all([
+      fetch(`${SERVER_URL}/api/subscriptions/stats`),
+      fetch(`${SERVER_URL}/api/subscriptions/recent`)
+    ]);
+
+    const statsData = await statsRes.json();
+    const recentData = await recentRes.json();
+
+    const s = statsData.stats;
+
+    grid.innerHTML = `
+      <div class="glass p-6 rounded-3xl text-center">
+        <div class="text-5xl font-bold text-purple-600">${s.total_subscribers || 0}</div>
+        <p class="text-gray-500">Подписчиков</p>
+      </div>
+      <div class="glass p-6 rounded-3xl text-center">
+        <div class="text-5xl font-bold text-emerald-600">${parseFloat(s.total_revenue || 0).toLocaleString('ru-RU')} ₸</div>
+        <p class="text-gray-500">Общая выручка</p>
+      </div>
+      <div class="glass p-6 rounded-3xl text-center">
+        <div class="text-5xl font-bold text-pink-600">${s.active_subscribers || 0}</div>
+        <p class="text-gray-500">Активных</p>
+      </div>
+      <div class="glass p-6 rounded-3xl text-center">
+        <div class="text-5xl font-bold text-amber-600">${parseFloat(s.monthly_revenue || 0).toLocaleString('ru-RU')} ₸</div>
+        <p class="text-gray-500">За период</p>
+      </div>
+    `;
+
+    let html = '';
+    (recentData.subscriptions || []).forEach(sub => {
+      html += `
+        <div class="glass p-5 rounded-2xl flex justify-between items-center">
+          <div>
+            <div class="font-medium">${sub.UserEmail}</div>
+            <div class="text-xs text-gray-500">${new Date(sub.StartDate).toLocaleDateString('ru-RU')}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-bold text-emerald-600">${sub.Amount} ₸</div>
+            <div class="text-xs ${sub.Status === 'active' ? 'text-green-600' : 'text-gray-400'}">${sub.Status}</div>
+          </div>
+        </div>`;
+    });
+    recent.innerHTML = html || '<p class="text-center py-12 text-gray-500">Пока нет подписок</p>';
+
+  } catch (e) {
+    console.error(e);
+    grid.innerHTML = `<div class="col-span-full glass p-12 text-red-500 text-center">Ошибка подключения к серверу</div>`;
+  }
+}
+
+// === Твои остальные функции (loadAllFeedback, analyzeWithAI, loadVisitStats) ===
+let allFeedbacks = [];
+
+async function loadAllFeedback() {
+  try {
+    const res = await fetch(`${SERVER_URL}/api/feedback`);
+    const data = await res.json();
+    allFeedbacks = data.feedback || [];
+    renderStats(allFeedbacks);
+    renderFeedbackList(allFeedbacks);
+  } catch (err) {
+    alert('Ошибка загрузки отзывов');
+  }
+}
+
+function renderStats(feedbacks) {
+  if (feedbacks.length === 0) {
+    document.getElementById('stats').innerHTML = `
+      <div class="glass p-8 text-center col-span-3">
+        <p class="text-gray-500">Отзывов пока нет</p>
+      </div>`;
+    return;
+  }
+
+  const total = feedbacks.length;
+  const avg = (feedbacks.reduce((a, b) => a + b.Rating, 0) / total).toFixed(1);
+  const positive = feedbacks.filter(f => f.Rating >= 4).length;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="glass p-8 rounded-3xl text-center">
+      <div class="text-5xl font-bold text-indigo-600">${total}</div>
+      <p class="text-gray-500 mt-2">Всего отзывов</p>
+    </div>
+    <div class="glass p-8 rounded-3xl text-center">
+      <div class="text-5xl font-bold text-amber-500">${avg}</div>
+      <p class="text-gray-500 mt-2">Средний рейтинг</p>
+    </div>
+    <div class="glass p-8 rounded-3xl text-center">
+      <div class="text-5xl font-bold text-emerald-500">${positive}</div>
+      <p class="text-gray-500 mt-2">Положительных отзывов</p>
+    </div>
+  `;
+}
+
+function renderFeedbackList(feedbacks) {
+  const container = document.getElementById('feedback-list');
+  
+  if (feedbacks.length === 0) {
+    container.innerHTML = `<p class="text-center text-gray-500 py-12">Отзывов пока нет</p>`;
+    return;
+  }
+
+  container.innerHTML = feedbacks.map(f => `
+    <div class="glass p-6 rounded-3xl feedback-card">
+      <div class="flex justify-between items-start">
+        <div class="text-4xl">${'★'.repeat(f.Rating)}${'☆'.repeat(5 - f.Rating)}</div>
+        <div class="text-xs text-gray-400 text-right">
+          ${new Date(f.CreatedAt).toLocaleDateString('ru-RU')}<br>
+          <span class="text-indigo-500">${f.UserEmail}</span>
+        </div>
+      </div>
+      ${f.Comment ? `
+        <p class="mt-5 text-gray-700 leading-relaxed">${f.Comment}</p>
+      ` : `
+        <p class="mt-5 italic text-gray-400">Комментарий не оставлен</p>
+      `}
+    </div>
+  `).join('');
+}
+
+// ====================== АНАЛИЗ ИИ ======================
+async function analyzeWithAI() {
+  const resultDiv = document.getElementById('ai-result');
+  const contentDiv = document.getElementById('ai-content');
+
+  resultDiv.classList.remove('hidden');
+  contentDiv.innerHTML = `
+    <div class="text-center py-20">
+      <div class="text-6xl mb-4 animate-pulse">🪞</div>
+      <p class="text-lg text-gray-500">MindMirror AI анализирует отзывы...</p>
+      <p class="text-sm text-gray-400 mt-2">Это может занять 10–20 секунд</p>
+    </div>`;
+
+  try {
+    const res = await fetch('http://localhost:3001/api/analyze-feedback', { 
+    method: 'POST' 
+});
+    const data = await res.json();
+
+    if (data.success) {
+      contentDiv.innerHTML = `
+        <div class="mb-6 p-4 bg-white/60 rounded-2xl text-sm">
+          Проанализировано отзывов: <strong>${data.totalReviews}</strong> | 
+          Средний рейтинг: <strong>${data.averageRating.toFixed(1)} ★</strong>
+        </div>
+        <div class="bg-white/70 p-7 rounded-3xl text-gray-800 leading-relaxed whitespace-pre-wrap">
+          ${data.analysis}
+        </div>
+      `;
+    } else {
+      contentDiv.innerHTML = `<p class="text-red-500 text-center py-12">Ошибка анализа: ${data.error || 'Неизвестная ошибка'}</p>`;
+    }
+  } catch (err) {
+    contentDiv.innerHTML = `<p class="text-red-500 text-center py-12">Не удалось подключиться к серверу.<br>Убедитесь, что server.js запущен.</p>`;
+    console.error(err);
+  }
+}
+
+// ====================== СТАТИСТИКА ПОСЕЩЕНИЙ ======================
+async function loadVisitStats() {
+    const resultDiv = document.getElementById('visit-stats');
+    const contentDiv = document.getElementById('stats-content');
+
+    resultDiv.classList.remove('hidden');
+    
+    contentDiv.innerHTML = `
+        <div class="col-span-3 text-center py-12">
+            <div class="text-5xl mb-4 animate-pulse">📊</div>
+            <p class="text-gray-500">Загрузка статистики посещений...</p>
+        </div>`;
+
+    try {
+        const res = await fetch('http://localhost:3002/api/stats/visits');
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || 'Ошибка загрузки');
+
+        const s = data.stats;
+
+        contentDiv.innerHTML = `
+            <div class="glass p-6 rounded-3xl text-center">
+                <div class="text-4xl font-bold text-indigo-600">${s.total_registered}</div>
+                <p class="text-gray-500 mt-2">Всего зарегистрировано</p>
+            </div>
+            <div class="glass p-6 rounded-3xl text-center">
+                <div class="text-4xl font-bold text-emerald-500">${s.today.unique_users}</div>
+                <p class="text-gray-500 mt-2">Уникальных сегодня</p>
+                <p class="text-xs text-gray-400">(${s.today.total_logins} входов)</p>
+            </div>
+            <div class="glass p-6 rounded-3xl text-center">
+                <div class="text-4xl font-bold text-blue-500">${s.last3days.unique_users}</div>
+                <p class="text-gray-500 mt-2">За 3 дня</p>
+                <p class="text-xs text-gray-400">(${s.last3days.total_logins} входов)</p>
+            </div>
+            <div class="glass p-6 rounded-3xl text-center">
+                <div class="text-4xl font-bold text-purple-500">${s.last7days.unique_users}</div>
+                <p class="text-gray-500 mt-2">За неделю</p>
+                <p class="text-xs text-gray-400">(${s.last7days.total_logins} входов)</p>
+            </div>
+            <div class="glass p-6 rounded-3xl text-center">
+                <div class="text-4xl font-bold text-amber-500">${s.last30days.unique_users}</div>
+                <p class="text-gray-500 mt-2">За месяц</p>
+                <p class="text-xs text-gray-400">(${s.last30days.total_logins} входов)</p>
+            </div>
+            <div class="glass p-6 rounded-3xl text-center">
+                <div class="text-4xl font-bold text-rose-500">${s.lastYear.unique_users}</div>
+                <p class="text-gray-500 mt-2">За год</p>
+                <p class="text-xs text-gray-400">(${s.lastYear.total_logins} входов)</p>
+            </div>
+            <div class="glass p-6 rounded-3xl text-center col-span-1 md:col-span-2 lg:col-span-3">
+                <div class="text-4xl font-bold text-gray-700">${s.all_time.unique_users}</div>
+                <p class="text-gray-500 mt-2">Уникальных пользователей за всё время</p>
+                <p class="text-xs text-gray-400">(${s.all_time.total_logins} всего входов)</p>
+            </div>
+        `;
+    } catch (err) {
+        contentDiv.innerHTML = `
+            <div class="col-span-3 text-center py-12 text-red-500">
+                Не удалось загрузить статистику.<br>
+                Убедитесь, что основной сервер (server.js) запущен.
+            </div>`;
+        console.error(err);
+    }
+}
+
+// Автозагрузка при открытии страницы
+window.onload = loadAllFeedback;
+</script>
+</body>
+</html>
