@@ -1,4 +1,4 @@
-// ====================== STATS SERVER - Отдельный сервер для аналитики ======================
+// ====================== STATS SERVER - Dedicated Analytics Server ======================
 const express = require('express');
 const sql = require('mssql');
 const cors = require('cors');
@@ -32,22 +32,22 @@ async function connectToDb(retries = 3) {
     for (let i = 1; i <= retries; i++) {
         try {
             pool = await sql.connect(dbConfig);
-            console.log('✅ Stats-сервер успешно подключён к базе данных MindMirrorDB');
+            console.log('✅ Stats server successfully connected to MindMirrorDB database');
             return;
         } catch (err) {
-            console.error(`❌ Попытка ${i}/${retries} подключения к БД не удалась:`, err.message);
+            console.error(`❌ DB connection attempt ${i}/${retries} failed:`, err.message);
             if (i === retries) throw err;
             await new Promise(res => setTimeout(res, 3000));
         }
     }
 }
 
-// ====================== МАРШРУТ СТАТИСТИКИ ======================
+// ====================== STATS ROUTE ======================
 app.get('/api/stats/visits', async (req, res) => {
     if (!pool) {
         return res.status(503).json({
             success: false,
-            error: 'База данных ещё не подключена. Попробуйте позже.'
+            error: 'Database is not connected yet. Please try again later.'
         });
     }
 
@@ -98,25 +98,25 @@ app.get('/api/stats/visits', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Ошибка получения статистики:', err.message);
+        console.error('Error retrieving statistics:', err.message);
         res.status(500).json({
             success: false,
-            error: 'Не удалось загрузить статистику посещений'
+            error: 'Failed to load visit statistics'
         });
     }
 });
 
-// ====================== ЗАПУСК СЕРВЕРА ======================
+// ====================== SERVER START ======================
 connectToDb()
     .then(() => {
         const PORT = process.env.STATS_PORT || 3002;
 
         app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Stats-сервер запущен на порту ${PORT}`);
-            console.log(`🌐 Эндпоинт: http://localhost:${PORT}/api/stats/visits`);
+            console.log(`🚀 Stats server running on port ${PORT}`);
+            console.log(`🌐 Endpoint: http://localhost:${PORT}/api/stats/visits`);
         });
     })
     .catch(err => {
-        console.error('💥 Критическая ошибка запуска stats-сервера:', err.message);
+        console.error('💥 Critical error starting stats server:', err.message);
         process.exit(1);
     });
