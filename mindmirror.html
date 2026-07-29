@@ -46,7 +46,7 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
 </head>
 <body>
 <div id="app" class="min-h-screen">
-<!-- AUTH SCREEN (Регистрация + Вход) -->
+<!-- AUTH SCREEN (Registration + Login) -->
 <div id="screen-auth" class="screen active">
   <div class="min-h-screen flex items-center justify-center p-4">
     <div class="glass p-8 md:p-12 w-full max-w-md">
@@ -54,17 +54,17 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
       <div class="text-center mb-8">
         <div class="text-5xl mb-4 float">🪞</div>
         <h1 class="text-3xl font-bold gradient-text">MindMirror</h1>
-        <p class="text-gray-500 mt-2">Загляни внутрь себя</p>
+        <p class="text-gray-500 mt-2">Look inside yourself</p>
       </div>
 
       <div class="flex rounded-3xl bg-white/50 p-1 mb-8">
         <button onclick="switchAuthTab(0)" id="tab-login" 
-                class="flex-1 py-3 rounded-3xl font-medium transition-all auth-tab active">Войти</button>
+                class="flex-1 py-3 rounded-3xl font-medium transition-all auth-tab active">Log In</button>
         <button onclick="switchAuthTab(1)" id="tab-register" 
-                class="flex-1 py-3 rounded-3xl font-medium transition-all auth-tab">Регистрация</button>
+                class="flex-1 py-3 rounded-3xl font-medium transition-all auth-tab">Register</button>
       </div>
 
-      <!-- Форма ВХОДА -->
+      <!-- LOGIN Form -->
       <form id="login-form" class="space-y-5" onsubmit="return handleLogin(event)">
         <div>
           <label class="text-sm font-medium mb-1.5 block">Email</label>
@@ -72,18 +72,18 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
           <p id="err-login-email" class="text-red-500 text-xs mt-1 hidden"></p>
         </div>
         <div>
-          <label class="text-sm font-medium mb-1.5 block">Пароль</label>
-          <input type="password" id="login-password" placeholder="Ваш пароль">
+          <label class="text-sm font-medium mb-1.5 block">Password</label>
+          <input type="password" id="login-password" placeholder="Your password">
           <p id="err-login-password" class="text-red-500 text-xs mt-1 hidden"></p>
         </div>
-        <button type="submit" class="gradient-btn w-full">Войти</button>
+        <button type="submit" class="gradient-btn w-full">Log In</button>
       </form>
 
-      <!-- Форма РЕГИСТРАЦИИ -->
+      <!-- REGISTRATION Form -->
       <form id="register-form" class="space-y-5 hidden" onsubmit="return handleRegister(event)">
         <div>
-          <label class="text-sm font-medium mb-1.5 block">Имя</label>
-          <input type="text" id="reg-name" placeholder="Как вас зовут?">
+          <label class="text-sm font-medium mb-1.5 block">Name</label>
+          <input type="text" id="reg-name" placeholder="What is your name?">
           <p id="err-name" class="text-red-500 text-xs mt-1 hidden"></p>
         </div>
         <div>
@@ -92,23 +92,24 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
           <p id="err-email" class="text-red-500 text-xs mt-1 hidden"></p>
         </div>
         <div>
-          <label class="text-sm font-medium mb-1.5 block">Пароль</label>
-          <input type="password" id="reg-password" placeholder="Минимум 6 символов">
+          <label class="text-sm font-medium mb-1.5 block">Password</label>
+          <input type="password" id="reg-password" placeholder="At least 6 characters">
           <p id="err-password" class="text-red-500 text-xs mt-1 hidden"></p>
         </div>
-        <button type="submit" class="gradient-btn w-full">Зарегистрироваться</button>
+        <button type="submit" class="gradient-btn w-full">Register</button>
       </form>
 
       <p id="auth-message" class="text-center text-sm mt-6 text-red-500"></p>
     </div>
   </div>
 </div>
+
 <div id="main-wrapper" class="hidden min-h-screen p-4 md:p-6 max-w-5xl mx-auto">
 
 <!-- NAV -->
 <nav class="glass px-6 py-4 flex items-center justify-between sticky top-0 z-50">
   <div class="flex items-center gap-3">
-    <!-- Гамбургер (мобильный) -->
+    <!-- Hamburger menu (Mobile) -->
     <button id="hamburger-btn" 
             class="md:hidden w-10 h-10 flex items-center justify-center text-3xl text-gray-700 hover:text-indigo-600 transition-colors">
       ☰
@@ -122,7 +123,7 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
 
   <div class="flex items-center gap-3">
     <div class="text-sm text-gray-600 hidden md:block">
-      Привет, <span class="font-semibold text-gray-800" id="nav-username"></span>
+      Hello, <span class="font-semibold text-gray-800" id="nav-username"></span>
     </div>
     <div onclick="showScreen('account')" 
          class="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold cursor-pointer hover:scale-105 transition-transform">
@@ -130,8 +131,9 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
     </div>
   </div>
 </nav>
-<!-- БОКОВАЯ ПАНЕЛЬ + ОВЕРЛЕЙ -->
-<div class="flex h-[calc(100vh-73px)]">   <!-- ← Важное исправление: фиксированная высота -->
+
+<!-- SIDEBAR + OVERLAY -->
+<div class="flex h-[calc(100vh-73px)]">   <!-- Fixed height adjustment -->
 
   <!-- Sidebar -->
   <div id="sidebar" 
@@ -142,27 +144,26 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
     </div>
 
     <div class="space-y-1 flex-1">
-      <!-- все кнопки меню без изменений -->
       <button onclick="showScreen('dashboard');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-dashboard">
-        🏠 <span>Главная</span>
+        🏠 <span>Dashboard</span>
       </button>
       <button onclick="showScreen('tests');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-tests">
-        📋 <span>Тесты</span>
+        📋 <span>Tests</span>
       </button>
       <button onclick="showScreen('ai');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-ai">
         🪞 <span>MindMirror AI</span>
       </button>
       <button onclick="showScreen('account');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-account">
-        👤 <span>Профиль</span>
+        👤 <span>Profile</span>
       </button>
       <button onclick="showScreen('support');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-support">
-        📧 <span>Поддержка</span>
+        📧 <span>Support</span>
       </button>
       <button onclick="showScreen('consultation');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-consultation">
-        🧑‍⚕️ <span>Консультация</span>
+        🧑‍⚕️ <span>Consultation</span>
       </button>
       <button onclick="showScreen('games');toggleSidebar()" class="nav-btn w-full justify-start flex items-center gap-3 text-left" id="nav-games">
-        🎮 <span>Мини-игры</span>
+        🎮 <span>Mini-games</span>
       </button>
       <button onclick="showScreen('premium');toggleSidebar()" 
               id="nav-premium"
@@ -174,16 +175,17 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
     <div class="mt-auto pt-6 border-t border-white/30">
       <button onclick="handleLogout();toggleSidebar()" 
               class="w-full text-left text-red-500 hover:text-red-600 flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-red-50 transition-colors">
-        ⬅️ Выйти
+        ⬅️ Log Out
       </button>
     </div>
   </div>
 
-  <!-- Оверлей -->
+  <!-- Overlay -->
   <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 hidden md:hidden z-40"></div>
 
-  <!-- Основной контент — теперь с прокруткой -->
+  <!-- Main Content Area -->
   <div class="flex-1 overflow-y-auto p-4 md:p-6 max-w-5xl mx-auto w-full bg-transparent">
+  
   <!-- DASHBOARD -->
   <div id="screen-dashboard" class="screen active">
     <div class="glass p-6 md:p-8 mb-6">
@@ -191,39 +193,39 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
       <p class="text-gray-500 mt-2" id="dash-subtitle"></p>
     </div>
     <div class="glass p-6 mb-6">
-      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">📊 Динамика настроения</h3>
+      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">📊 Mood Dynamics</h3>
       <div style="height:220px"><canvas id="moodChart"></canvas></div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="glass stat-card"><div class="text-3xl mb-2">🧪</div><div class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="stat-count">0</div><div class="text-sm text-gray-500">Тестов пройдено</div></div>
-      <div class="glass stat-card"><div class="text-3xl mb-2">📈</div><div class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="stat-mood">—/10</div><div class="text-sm text-gray-500">Последнее настроение</div></div>
-      <div class="glass stat-card cursor-pointer hover:scale-105 transition-transform" onclick="showScreen('tests')"><div class="text-3xl mb-2">🚀</div><div class="text-lg font-bold gradient-text" style="font-family:'Space Grotesk'">Начать тест</div><div class="text-sm text-gray-500">Пройти прямо сейчас</div></div>
+      <div class="glass stat-card"><div class="text-3xl mb-2">🧪</div><div class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="stat-count">0</div><div class="text-sm text-gray-500">Tests Completed</div></div>
+      <div class="glass stat-card"><div class="text-3xl mb-2">📈</div><div class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="stat-mood">—/10</div><div class="text-sm text-gray-500">Latest Mood</div></div>
+      <div class="glass stat-card cursor-pointer hover:scale-105 transition-transform" onclick="showScreen('tests')"><div class="text-3xl mb-2">🚀</div><div class="text-lg font-bold gradient-text" style="font-family:'Space Grotesk'">Start Test</div><div class="text-sm text-gray-500">Take a test right now</div></div>
     </div>
   </div>
 
   <!-- TESTS CATALOG -->
   <div id="screen-tests" class="screen">
     <div class="text-center mb-6">
-      <h2 class="text-2xl md:text-3xl font-bold">Каталог тестов</h2>
-      <p class="text-gray-500 mt-1">Выберите тест для самодиагностики</p>
+      <h2 class="text-2xl md:text-3xl font-bold">Test Catalog</h2>
+      <p class="text-gray-500 mt-1">Select a test for self-assessment</p>
     </div>
     <div class="max-w-md mx-auto mb-8 relative">
       <div class="glass flex items-center px-5 py-3 rounded-3xl">
         <span class="text-2xl mr-3">🔍</span>
-        <input id="search-input" type="text" placeholder="Поиск теста..." class="flex-1 bg-transparent outline-none text-lg placeholder-gray-400 font-medium">
+        <input id="search-input" type="text" placeholder="Search tests..." class="flex-1 bg-transparent outline-none text-lg placeholder-gray-400 font-medium">
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="test-cards"></div>
     <div id="no-results" class="hidden text-center py-12">
       <div class="text-6xl mb-4">😕</div>
-      <p class="text-xl text-gray-500">Ничего не найдено</p>
+      <p class="text-xl text-gray-500">No results found</p>
     </div>
   </div>
 
   <!-- TESTING -->
   <div id="screen-testing" class="screen">
     <div class="max-w-2xl mx-auto">
-      <button class="text-gray-500 hover:text-gray-800 text-sm mb-4 cursor-pointer transition-colors" onclick="showScreen('tests')">← Назад к тестам</button>
+      <button class="text-gray-500 hover:text-gray-800 text-sm mb-4 cursor-pointer transition-colors" onclick="showScreen('tests')">← Back to Tests</button>
       <div class="glass p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-semibold" style="font-family:'Space Grotesk'" id="test-title"></h3>
@@ -243,7 +245,7 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
     <div class="max-w-3xl mx-auto space-y-6">
       <div class="glass p-8 text-center">
         <div class="text-5xl mb-4" id="result-emoji"></div>
-        <h2 class="text-2xl font-bold mb-2" style="font-family:'Space Grotesk'">Результаты</h2>
+        <h2 class="text-2xl font-bold mb-2" style="font-family:'Space Grotesk'">Results</h2>
         <p class="text-lg font-semibold" id="result-verdict"></p>
         <div class="mt-6 mx-auto" style="width:192px;height:192px;position:relative">
           <svg viewBox="0 0 100 100" class="w-full h-full progress-ring">
@@ -258,28 +260,28 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
         <div class="mt-6 grid grid-cols-2 gap-3 text-sm hidden" id="result-details"></div>
       </div>
       <div>
-        <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">💡 Рекомендации для вас</h3>
+        <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">💡 Recommendations for You</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="result-advice"></div>
       </div>
       <div class="flex gap-3 justify-center">
-        <button class="px-6 py-3 rounded-2xl border border-purple-200 hover:bg-purple-50 transition-all cursor-pointer" onclick="showScreen('tests')">Другие тесты</button>
-        <button class="gradient-btn" onclick="showScreen('dashboard')">На главную</button>
+        <button class="px-6 py-3 rounded-2xl border border-purple-200 hover:bg-purple-50 transition-all cursor-pointer" onclick="showScreen('tests')">Other Tests</button>
+        <button class="gradient-btn" onclick="showScreen('dashboard')">Go to Dashboard</button>
       </div>
     </div>
   </div>
 
- <!-- ACCOUNT SCREEN -->
+<!-- ACCOUNT SCREEN -->
 <div id="screen-account" class="screen">
   <div class="max-w-2xl mx-auto space-y-6">
     
-    <!-- Карточка профиля -->
+    <!-- Profile Card -->
     <div class="glass p-6 md:p-8">
       <div class="flex items-center gap-4 mb-6">
         <div onclick="triggerAvatarUpload()" 
              class="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl text-white font-bold cursor-pointer overflow-hidden border-4 border-white shadow-lg hover:scale-105 transition-all bg-cover bg-center"
              id="account-avatar"
              style="background: linear-gradient(135deg, #6366f1, #a855f7);">
-          <!-- аватар будет вставлен через JS -->
+          <!-- Avatar will be inserted via JS -->
         </div>
         <div>
           <h2 class="text-2xl font-bold" style="font-family:'Space Grotesk'" id="account-name"></h2>
@@ -291,40 +293,41 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <button onclick="editProfile()" 
                 class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition-all flex items-center justify-center gap-2">
-          ✏️ Редактировать профиль
+          ✏️ Edit Profile
         </button>
         
-       <button onclick="openFeedbackModal()" 
-            class="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-medium transition-all flex items-center justify-center gap-2">
-      ⭐ Оставить отзыв
-    </button>
+        <button onclick="openFeedbackModal()" 
+                class="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-medium transition-all flex items-center justify-center gap-2">
+          ⭐ Leave Feedback
+        </button>
 
         <button onclick="handleLogout()" 
                 class="px-5 py-3 rounded-2xl border border-red-200 text-red-500 hover:bg-red-50 transition-all text-sm font-medium cursor-pointer">
-          Выйти из аккаунта
+          Log Out
         </button>
       </div>
     </div>
 
-    <!-- История тестов -->
+    <!-- Test History -->
     <div class="glass p-6">
-      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">📜 История тестов</h3>
+      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">📜 Test History</h3>
       <div id="history-list" class="space-y-3"></div>
     </div>
-        <!-- История консультаций -->
+    
+    <!-- Consultation History -->
     <div class="glass p-6">
-      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">🧑‍⚕️ История консультаций</h3>
+      <h3 class="font-semibold text-lg mb-4" style="font-family:'Space Grotesk'">🧑‍⚕️ Consultation History</h3>
       <div id="consultation-history" class="space-y-3"></div>
     </div>
   </div>
 </div>
-<!-- ====================== ПОДДЕРЖКА ====================== -->
+<!-- ====================== SUPPORT ====================== -->
 <div id="screen-support" class="screen">
   <div class="glass p-8 max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk'">📧 Техническая поддержка</h2>
+    <h2 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk'">📧 Technical Support</h2>
     <form onsubmit="handleContact(event)" class="space-y-6">
       <div>
-        <label class="block text-sm font-medium mb-2">Имя</label>
+        <label class="block text-sm font-medium mb-2">Name</label>
         <input id="support-name" type="text" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
       </div>
       <div>
@@ -332,105 +335,105 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
         <input id="support-email" type="email" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
       </div>
       <div>
-        <label class="block text-sm font-medium mb-2">Тема</label>
-        <input id="support-subject" type="text" placeholder="Коротко опишите проблему" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
+        <label class="block text-sm font-medium mb-2">Subject</label>
+        <input id="support-subject" type="text" placeholder="Briefly describe the issue" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
       </div>
       <div>
-        <label class="block text-sm font-medium mb-2">Сообщение</label>
-        <textarea id="support-message" rows="6" placeholder="Опишите подробно..." class="w-full px-5 py-4 rounded-3xl border border-gray-300 focus:border-indigo-500 outline-none resize-none"></textarea>
+        <label class="block text-sm font-medium mb-2">Message</label>
+        <textarea id="support-message" rows="6" placeholder="Describe in detail..." class="w-full px-5 py-4 rounded-3xl border border-gray-300 focus:border-indigo-500 outline-none resize-none"></textarea>
       </div>
-      <button type="submit" class="gradient-btn w-full py-4 text-lg">Отправить в поддержку</button>
+      <button type="submit" class="gradient-btn w-full py-4 text-lg">Send to Support</button>
     </form>
   </div>
 </div>
 
-<!-- ====================== КОНСУЛЬТАЦИЯ ====================== -->
+<!-- ====================== CONSULTATION ====================== -->
 <div id="screen-consultation" class="screen">
   <div class="max-w-3xl mx-auto">
     <div class="glass p-8">
-      <h2 class="text-3xl font-bold mb-6" style="font-family:'Space Grotesk'">🧑‍⚕️ Запись на консультацию с психологом</h2>
+      <h2 class="text-3xl font-bold mb-6" style="font-family:'Space Grotesk'">🧑‍⚕️ Book a Consultation with a Psychologist</h2>
       
-      <!-- Форма новой записи -->
+      <!-- New Booking Form -->
       <div class="mb-12">
-        <h3 class="text-xl font-semibold mb-4">Новая заявка</h3>
+        <h3 class="text-xl font-semibold mb-4">New Request</h3>
         <form id="consultation-form" onsubmit="handleBookConsultation(event)" class="space-y-6">
           <div>
-            <label class="block text-sm font-medium mb-2">Тема консультации</label>
+            <label class="block text-sm font-medium mb-2">Consultation Topic</label>
             <select id="consult-topic" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
-              <option value="">Выберите тему...</option>
-              <option value="Тревога и стресс">Тревога и стресс</option>
-              <option value="Депрессия и настроение">Депрессия и настроение</option>
-              <option value="Отношения и семья">Отношения и семья</option>
-              <option value="Самооценка и уверенность">Самооценка и уверенность</option>
-              <option value="Другое">Другое</option>
+              <option value="">Select a topic...</option>
+              <option value="Anxiety and stress">Anxiety and stress</option>
+              <option value="Depression and mood">Depression and mood</option>
+              <option value="Relationships and family">Relationships and family</option>
+              <option value="Self-esteem and confidence">Self-esteem and confidence</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           
           <div>
-            <label class="block text-sm font-medium mb-2">Желаемая дата и время</label>
+            <label class="block text-sm font-medium mb-2">Preferred Date and Time</label>
             <input id="consult-date" type="datetime-local" class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-indigo-500 outline-none">
           </div>
           
           <div>
-            <label class="block text-sm font-medium mb-2">Дополнительные заметки (по желанию)</label>
-            <textarea id="consult-notes" rows="4" placeholder="Расскажите кратко, о чём хотите поговорить..." class="w-full px-5 py-4 rounded-3xl border border-gray-300 focus:border-indigo-500 outline-none resize-none"></textarea>
+            <label class="block text-sm font-medium mb-2">Additional Notes (Optional)</label>
+            <textarea id="consult-notes" rows="4" placeholder="Briefly share what you would like to talk about..." class="w-full px-5 py-4 rounded-3xl border border-gray-300 focus:border-indigo-500 outline-none resize-none"></textarea>
           </div>
           
-          <button type="submit" class="gradient-btn w-full py-4 text-lg">📅 Записаться на консультацию</button>
+          <button type="submit" class="gradient-btn w-full py-4 text-lg">📅 Book Consultation</button>
         </form>
       </div>
     </div>
   </div>
 </div>
 
-
-<!-- ====================== МИНИ-ИГРЫ ====================== -->
+<!-- ====================== MINI-GAMES ====================== -->
 <div id="screen-games" class="screen">
   <div class="text-center mb-8">
-    <h2 class="text-3xl font-bold">🎮 Мини-игры для спокойствия</h2>
-    <p class="text-gray-500 mt-2">Выберите игру, которая поможет прямо сейчас</p>
+    <h2 class="text-3xl font-bold">🎮 Mini-Games for Calmness</h2>
+    <p class="text-gray-500 mt-2">Choose a game to help you right now</p>
   </div>
   <div id="games-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
 </div>
-<!-- Модальное окно редактирования профиля -->
+
+<!-- Edit Profile Modal -->
 <div id="modal-edit-profile" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
   <div class="glass max-w-md w-full mx-4 p-8 rounded-3xl">
-    <h2 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk'">Редактировать профиль</h2>
+    <h2 class="text-2xl font-bold mb-6" style="font-family:'Space Grotesk'">Edit Profile</h2>
     
     <div class="space-y-6">
       <div>
-        <label class="block text-sm font-medium mb-2">Имя</label>
+        <label class="block text-sm font-medium mb-2">Name</label>
         <input id="edit-name" type="text" 
                class="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:border-indigo-500">
       </div>
 
       <div>
-        <label class="block text-sm font-medium mb-2">Аватар</label>
+        <label class="block text-sm font-medium mb-2">Avatar</label>
         <input id="edit-avatar" type="file" accept="image/*" class="w-full">
-        <p class="text-xs text-gray-500 mt-1">Можно загрузить новое фото (макс. 10 МБ)</p>
+        <p class="text-xs text-gray-500 mt-1">Upload a new photo (max 10 MB)</p>
       </div>
     </div>
 
     <div class="flex gap-3 mt-8">
       <button onclick="closeEditModal()" 
               class="flex-1 py-3 rounded-2xl border border-gray-300 hover:bg-gray-100 transition-all">
-        Отмена
+        Cancel
       </button>
       <button onclick="saveProfileChanges()" 
               class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all">
-        Сохранить изменения
+        Save Changes
       </button>
     </div>
   </div>
 </div>
 
-<!-- МОДАЛЬНОЕ ОКНО ОТЗЫВА -->
+<!-- FEEDBACK MODAL -->
 <div id="modal-feedback" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
   <div class="glass max-w-md w-full mx-4 p-8 rounded-3xl">
-    <h2 class="text-2xl font-bold mb-6 text-center" style="font-family:'Space Grotesk'">Как вам MindMirror?</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center" style="font-family:'Space Grotesk'">How do you like MindMirror?</h2>
     
     <div class="text-center mb-8">
-      <p class="text-gray-600 mb-4">Поставьте оценку</p>
+      <p class="text-gray-600 mb-4">Leave a rating</p>
       <div id="star-rating" class="flex justify-center gap-2 text-4xl cursor-pointer">
         <span data-value="1">☆</span>
         <span data-value="2">☆</span>
@@ -441,137 +444,138 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
     </div>
 
     <div class="mb-6">
-      <label class="block text-sm font-medium mb-2">Ваш комментарий (по желанию)</label>
+      <label class="block text-sm font-medium mb-2">Your Comment (Optional)</label>
       <textarea id="feedback-comment" rows="4" 
                 class="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:outline-none focus:border-indigo-500 resize-y"
-                placeholder="Что вам понравилось? Что можно улучшить?"></textarea>
+                placeholder="What did you enjoy? What could be improved?"></textarea>
     </div>
 
     <div class="flex gap-3">
       <button onclick="closeFeedbackModal()" 
               class="flex-1 py-3 rounded-2xl border border-gray-300 hover:bg-gray-100 transition-all">
-        Отмена
+        Cancel
       </button>
       <button onclick="submitFeedback()" 
               class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all">
-        Отправить отзыв
+        Submit Feedback
       </button>
     </div>
   </div>
 </div>
-
- <!-- ====================== MINDMIRROR AI (КРАСИВЫЙ + РАБОЧИЙ) ====================== -->
+ <!-- ====================== MINDMIRROR AI ====================== -->
 <div id="screen-ai" class="screen">
   <div class="max-w-3xl mx-auto h-[calc(100vh-100px)] flex flex-col p-4">
 
-    <!-- Шапка -->
+    <!-- Header -->
     <div class="glass rounded-3xl px-6 py-4 mb-6 flex items-center gap-4">
       <div class="w-11 h-11 bg-gradient-to-br from-amber-400 to-yellow-300 rounded-2xl flex items-center justify-center text-4xl shadow-inner">🪞</div>
       <div>
         <h2 class="text-2xl font-bold text-gray-800">MindMirror AI</h2>
-        <p class="text-sm text-gray-500">Твоё зеркало души</p>
+        <p class="text-sm text-gray-500">Your soul's mirror</p>
       </div>
     </div>
 
-    <!-- Приветственная карточка -->
+    <!-- Welcome Card -->
     <div id="ai-welcome" class="flex-1 glass rounded-3xl p-10 flex flex-col items-center justify-center text-center">
       <div class="text-8xl mb-8">🪞</div>
-      <h3 class="text-3xl font-semibold text-gray-800 mb-3">Привет! Я MindMirror AI.</h3>
-      <p class="text-xl text-gray-600 max-w-md">Расскажи, что у тебя на душе сегодня?</p>
+      <h3 class="text-3xl font-semibold text-gray-800 mb-3">Hello! I am MindMirror AI.</h3>
+      <p class="text-xl text-gray-600 max-w-md">Tell me, what is on your mind today?</p>
     </div>
 
-    <!-- Чат-сообщения -->
+    <!-- Chat Messages -->
     <div id="ai-messages" class="flex-1 overflow-y-auto space-y-6 px-2 hidden"></div>
 
-    <!-- Поле ввода -->
+    <!-- Input Field -->
     <div class="glass rounded-3xl p-3 mt-4">
       <div class="flex gap-3">
         <input 
           id="ai-input" 
           type="text" 
-          placeholder="Напиши, что у тебя на душе..." 
+          placeholder="Write what's on your mind..." 
           class="flex-1 px-7 py-6 bg-white rounded-3xl outline-none text-lg placeholder-gray-400 focus:border-purple-400 border border-transparent"
           onkeypress="if(event.key === 'Enter') sendAIMessage()">
         <button onclick="sendAIMessage()" 
                 class="px-10 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-medium rounded-3xl hover:brightness-110 transition-all">
-          Отправить
+          Send
         </button>
       </div>
     </div>
 
-    <!-- Быстрые кнопки -->
+    <!-- Quick Buttons -->
     <div class="flex flex-wrap gap-2 mt-5 justify-center">
-      <button onclick="quickAIMessage('Переформулировать мысль')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Переформулировать мысль</button>
-      <button onclick="quickAIMessage('Разобрать ситуацию')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Разобрать ситуацию</button>
-      <button onclick="quickAIMessage('Мне тяжело')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Мне тяжело</button>
-      <button onclick="quickAIMessage('Анализ дневника')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Анализ дневника</button>
+      <button onclick="quickAIMessage('Reframe thought')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Reframe thought</button>
+      <button onclick="quickAIMessage('Analyze situation')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Analyze situation</button>
+      <button onclick="quickAIMessage('I am having a hard time')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">I am having a hard time</button>
+      <button onclick="quickAIMessage('Journal analysis')" class="text-sm px-6 py-3 bg-white hover:bg-purple-50 border border-purple-200 rounded-3xl transition-colors">Journal analysis</button>
     </div>
 
   </div>
 </div>
-  <!-- ====================== ИГРА: САД БЛАГОДАРНОСТИ ====================== -->
+
+<!-- ====================== GAME: GRATITUDE GARDEN ====================== -->
 <div id="screen-garden" class="screen hidden">
   <div class="max-w-3xl mx-auto">
     <div class="glass p-6 md:p-8">
-      <!-- Заголовок -->
+      <!-- Header -->
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h2 class="text-3xl font-bold gradient-text">Сад Благодарности</h2>
-          <p class="text-gray-500">Посади то, за что ты благодарен сегодня</p>
+          <h2 class="text-3xl font-bold gradient-text">Gratitude Garden</h2>
+          <p class="text-gray-500">Plant what you are grateful for today</p>
         </div>
         <button onclick="exitGarden()" 
                 class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
       </div>
 
-      <!-- Этапы -->
+      <!-- Stages -->
       <div id="garden-stage-1" class="stage">
         <div class="text-center mb-8">
           <div class="text-6xl mb-4">🌱</div>
-          <h3 class="text-xl font-semibold mb-2">Что сделало твой день лучше?</h3>
-          <p class="text-gray-500">Напиши 3–5 вещей, за которые ты благодарен</p>
+          <h3 class="text-xl font-semibold mb-2">What made your day better?</h3>
+          <p class="text-gray-500">Write 3–5 things you are grateful for</p>
         </div>
 
         <div id="gratitude-inputs" class="space-y-3 mb-8"></div>
 
         <button onclick="plantSeeds()" 
-                class="gradient-btn w-full py-4 text-lg">Посадить в сад 🌼</button>
+                class="gradient-btn w-full py-4 text-lg">Plant in garden 🌼</button>
       </div>
 
-      <!-- Этап роста -->
+      <!-- Growth Stage -->
       <div id="garden-stage-2" class="stage hidden">
         <div class="text-center mb-6">
-          <h3 class="text-2xl font-bold mb-2">Твой сад растёт...</h3>
+          <h3 class="text-2xl font-bold mb-2">Your garden is growing...</h3>
           <div id="growth-progress" class="h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-3000" style="width:0%"></div>
         </div>
         <canvas id="garden-canvas" width="700" height="420" class="mx-auto bg-gradient-to-b from-sky-100 to-emerald-100 rounded-3xl shadow-inner"></canvas>
       </div>
 
-      <!-- Финальный результат -->
+      <!-- Final Result Stage -->
       <div id="garden-stage-3" class="stage hidden text-center">
         <div class="mb-6">
-          <h2 class="text-3xl font-bold gradient-text mb-2">Твой прекрасный сад готов ✨</h2>
-          <p class="text-gray-600">Каждый цветок — это твоя благодарность</p>
+          <h2 class="text-3xl font-bold gradient-text mb-2">Your beautiful garden is ready ✨</h2>
+          <p class="text-gray-600">Every flower represents your gratitude</p>
         </div>
         <canvas id="final-garden-canvas" width="700" height="420" class="mx-auto bg-gradient-to-b from-sky-100 to-emerald-100 rounded-3xl shadow-inner"></canvas>
         
         <div class="flex gap-4 justify-center mt-8">
           <button onclick="restartGarden()" 
-                  class="px-8 py-3 rounded-2xl border border-purple-200 hover:bg-purple-50">Посадить ещё</button>
+                  class="px-8 py-3 rounded-2xl border border-purple-200 hover:bg-purple-50">Plant more</button>
           <button onclick="downloadGarden()" 
-                  class="gradient-btn">Сохранить как обои</button>
+                  class="gradient-btn">Save as wallpaper</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- ====================== ИГРА: КРУГ СПОКОЙСТВИЯ ====================== -->
+
+<!-- ====================== GAME: CIRCLE OF CALM ====================== -->
 <div id="screen-breathing" class="screen hidden">
   <div class="max-w-lg mx-auto">
     <div class="glass p-6 md:p-8">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h2 class="text-3xl font-bold gradient-text">Круг Спокойствия</h2>
-          <p class="text-gray-500">Дыши медленно — и успокой ум</p>
+          <h2 class="text-3xl font-bold gradient-text">Circle of Calm</h2>
+          <p class="text-gray-500">Breathe slowly — and quiet your mind</p>
         </div>
         <button onclick="exitBreathing()" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
       </div>
@@ -583,37 +587,38 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
         </div>
 
         <div class="text-center mb-8">
-          <div id="breathing-instruction" class="text-2xl font-semibold text-purple-700 mb-2">Вдох...</div>
+          <div id="breathing-instruction" class="text-2xl font-semibold text-purple-700 mb-2">Inhale...</div>
           <div id="breathing-count" class="text-5xl font-bold text-gray-300">4</div>
         </div>
 
         <div class="flex gap-4">
           <button onclick="startBreathing()" 
                   id="start-breathing-btn"
-                  class="gradient-btn px-10 py-4 text-lg">Начать дыхание</button>
+                  class="gradient-btn px-10 py-4 text-lg">Start Breathing</button>
           
           <button onclick="exitBreathing()" 
-                  class="px-8 py-4 rounded-3xl border border-gray-300 hover:bg-gray-100">Завершить</button>
+                  class="px-8 py-4 rounded-3xl border border-gray-300 hover:bg-gray-100">Finish</button>
         </div>
       </div>
 
       <div id="breathing-complete" class="hidden text-center mt-8">
         <div class="text-5xl mb-4">✨</div>
-        <h3 class="text-2xl font-bold mb-2">Отличная работа!</h3>
-        <p class="text-gray-600">Ты только что снизил уровень стресса ❤️</p>
-        <button onclick="restartBreathing()" class="mt-6 gradient-btn">Ещё раз</button>
+        <h3 class="text-2xl font-bold mb-2">Great job!</h3>
+        <p class="text-gray-600">You have just lowered your stress level ❤️</p>
+        <button onclick="restartBreathing()" class="mt-6 gradient-btn">Try again</button>
       </div>
     </div>
   </div>
 </div>
-<!-- ====================== ИГРА: ПУЗЫРИ СТРЕССА ====================== -->
+
+<!-- ====================== GAME: STRESS BUBBLES ====================== -->
 <div id="screen-bubbles" class="screen hidden">
   <div class="max-w-4xl mx-auto">
     <div class="glass p-6 md:p-8">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h2 class="text-3xl font-bold gradient-text">Пузыри Стресса</h2>
-          <p class="text-gray-500">Лопай негатив — получай позитив ✨</p>
+          <h2 class="text-3xl font-bold gradient-text">Stress Bubbles</h2>
+          <p class="text-gray-500">Pop negativity — embrace positivity ✨</p>
         </div>
         <button onclick="exitBubbles()" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
       </div>
@@ -623,24 +628,25 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
                 class="rounded-3xl shadow-inner bg-gradient-to-br from-purple-50 to-pink-50"></canvas>
         
         <div id="bubbles-stats" class="absolute top-4 left-4 bg-white/80 backdrop-blur-md px-5 py-2 rounded-2xl text-sm font-medium">
-          Лопнуто: <span id="bubbles-popped" class="text-purple-600 font-bold">0</span>/15
+          Popped: <span id="bubbles-popped" class="text-purple-600 font-bold">0</span>/15
         </div>
       </div>
 
       <div class="text-center mt-6">
         <button onclick="startBubblesGame()" id="start-bubbles-btn"
-                class="gradient-btn px-10 py-4 text-lg">Начать сеанс</button>
+                class="gradient-btn px-10 py-4 text-lg">Start Session</button>
       </div>
 
       <div id="bubbles-complete" class="hidden text-center mt-8">
         <div class="text-6xl mb-4">🎉</div>
-        <h3 class="text-2xl font-bold mb-2">Отличная работа!</h3>
-        <p class="text-gray-600 mb-6">Ты только что освободил(а) свой разум от стресса</p>
-        <button onclick="restartBubbles()" class="gradient-btn">Играть ещё раз</button>
+        <h3 class="text-2xl font-bold mb-2">Great job!</h3>
+        <p class="text-gray-600 mb-6">You have just freed your mind from stress</p>
+        <button onclick="restartBubbles()" class="gradient-btn">Play again</button>
       </div>
     </div>
   </div>
 </div>
+
 <!-- ====================== PREMIUM SCREEN ====================== -->
 <div id="screen-premium" class="screen hidden">
   <div class="max-w-3xl mx-auto p-6">
@@ -649,347 +655,347 @@ input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,2
         <div class="inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-3xl mb-6 text-lg font-semibold">
           ✨ MindMirror Premium
         </div>
-        <h2 class="text-4xl font-bold mb-3">Полная версия<br>самопознания</h2>
-        <p class="text-xl text-gray-600">Без лимитов. С максимальной заботой о тебе.</p>
+        <h2 class="text-4xl font-bold mb-3">The Full Version<br>of Self-Discovery</h2>
+        <p class="text-xl text-gray-600">No limits. Maximum care for you.</p>
       </div>
 
       <div class="grid md:grid-cols-2 gap-8 mb-12">
-        <!-- Бесплатный план -->
+        <!-- Free Plan -->
         <div class="glass p-8 rounded-3xl">
-          <h3 class="text-xl font-semibold mb-6">Бесплатно</h3>
+          <h3 class="text-xl font-semibold mb-6">Free</h3>
           <ul class="space-y-4">
-            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> 3 теста в неделю</li>
-            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Базовый AI</li>
-            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> 3 мини-игры</li>
-            <li class="flex items-start gap-3 text-gray-400"><span class="mt-1">✘</span> Неограниченные тесты</li>
-            <li class="flex items-start gap-3 text-gray-400"><span class="mt-1">✘</span> Полный AI + история</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> 3 tests per week</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Basic AI</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> 3 mini-games</li>
+            <li class="flex items-start gap-3 text-gray-400"><span class="mt-1">✘</span> Unlimited tests</li>
+            <li class="flex items-start gap-3 text-gray-400"><span class="mt-1">✘</span> Full AI + History</li>
           </ul>
         </div>
 
-<!-- Премиум план -->
-<div class="glass p-8 rounded-3xl border-2 border-purple-500 relative overflow-hidden">
-  <div class="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-6 py-1">ЛУЧШИЙ ВЫБОР</div>
-  
-  <h3 class="text-2xl font-bold text-purple-700 mb-2">Premium</h3>
-  <div class="flex items-baseline gap-2 mb-8">
-    <span class="text-5xl font-bold">990 ₸</span>
-    <span class="text-gray-500">/ месяц</span>
-  </div>
+        <!-- Premium Plan -->
+        <div class="glass p-8 rounded-3xl border-2 border-purple-500 relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-6 py-1">BEST VALUE</div>
+          
+          <h3 class="text-2xl font-bold text-purple-700 mb-2">Premium</h3>
+          <div class="flex items-baseline gap-2 mb-8">
+            <span class="text-5xl font-bold">990 ₸</span>
+            <span class="text-gray-500">/ month</span>
+          </div>
 
-  <ul class="space-y-4 mb-10">
-    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Неограниченные тесты</li>
-    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Полный MindMirror AI</li>
-    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Все мини-игры</li>
-    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Полная история + графики</li>
-    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Эксклюзивные тесты</li>
-    <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Приоритет на консультации</li>
-  </ul>
+          <ul class="space-y-4 mb-10">
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Unlimited tests</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Full MindMirror AI</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> All mini-games</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Full history + analytics</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Exclusive tests</li>
+            <li class="flex items-start gap-3"><span class="text-green-500 mt-1">✔</span> Priority consultation booking</li>
+          </ul>
 
-  <div class="flex gap-3">
-    <button onclick="showPaymentModal()" 
-            class="flex-1 gradient-btn py-5 text-lg font-semibold">
-      Оформить Premium
-    </button>
-    
-    <button onclick="cancelSubscription()" 
-            id="cancel-premium-btn"
-            class="flex-1 py-5 rounded-2xl border border-red-300 text-red-600 hover:bg-red-50 font-medium hidden">
-      Отменить подписку
-    </button>
-  </div>
-</div>
+          <div class="flex gap-3">
+            <button onclick="showPaymentModal()" 
+                    class="flex-1 gradient-btn py-5 text-lg font-semibold">
+              Get Premium
+            </button>
+            
+            <button onclick="cancelSubscription()" 
+                    id="cancel-premium-btn"
+                    class="flex-1 py-5 rounded-2xl border border-red-300 text-red-600 hover:bg-red-50 font-medium hidden">
+              Cancel Subscription
+            </button>
+          </div>
+        </div>
 
-      <p class="text-center text-xs text-gray-500">Отмена в любой момент • Автоматическое продление</p>
+      <p class="text-center text-xs text-gray-500">Cancel anytime • Auto-renewal</p>
     </div>
   </div>
 </div>
   
-  <!-- MINI GAMES SCREEN -->
+<!-- MINI GAMES SCREEN -->
 <div id="screen-games" class="screen">
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold gradient-text">🎮 Мини-игры</h2>
-      <p class="text-gray-500 mt-2">Инструменты для быстрого восстановления и развития</p>
+      <h2 class="text-3xl font-bold gradient-text">🎮 Mini-Games</h2>
+      <p class="text-gray-500 mt-2">Tools for quick recovery and self-development</p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="games-grid">
-      <!-- Игры будут подгружаться через JS -->
+      <!-- Games will be loaded dynamically via JS -->
     </div>
   </div>
 </div>
-</div> <!-- Закрытие основного контента -->
-  </div>   <!-- Закрытие flex (sidebar + content) -->
+</div> <!-- Closing main content area -->
+  </div>   <!-- Closing flex (sidebar + content) -->
 </div><!-- /main-wrapper -->
 </div><!-- /app -->
 <script>
-
 // ===== DATA =====
 const answerOptions = [
-  {label:"Никогда",value:0},{label:"Редко",value:1},{label:"Иногда",value:2},{label:"Часто",value:3},{label:"Постоянно",value:4}
+  {label:"Never",value:0},{label:"Rarely",value:1},{label:"Sometimes",value:2},{label:"Often",value:3},{label:"Constantly",value:4}
 ];
 const tests = [
   {
-    id:"eq", title:"Эмоциональный интеллект (EQ)", description:"Оцените способность распознавать и управлять эмоциями — своими и чужими.", icon:"🧠",
+    id:"eq", title:"Emotional Intelligence (EQ)", description:"Assess your ability to recognize and manage emotions — both your own and others'.", icon:"🧠",
     questions:[
-      {text:"Я легко определяю, что чувствую в конкретный момент.",cat:"self-awareness"},
-      {text:"Я понимаю, как мои эмоции влияют на мои решения.",cat:"self-awareness"},
-      {text:"Я способен точно назвать свою эмоцию (гнев, грусть, тревога и т.д.).",cat:"self-awareness"},
-      {text:"Я замечаю изменения в своём настроении до того, как они начинают влиять на поведение.",cat:"self-awareness"},
-      {text:"Я знаю свои сильные и слабые стороны в общении.",cat:"self-awareness"},
-      {text:"Я могу успокоиться, когда чувствую сильное раздражение.",cat:"self-regulation"},
-      {text:"Я контролирую импульсивные реакции в стрессовых ситуациях.",cat:"self-regulation"},
-      {text:"Я способен адаптироваться к неожиданным изменениям планов.",cat:"self-regulation"},
-      {text:"Я легко считываю эмоции других людей по выражению лица.",cat:"empathy"},
-      {text:"Я чувствую, когда человеку рядом плохо, даже если он молчит.",cat:"empathy"},
-      {text:"Мне легко поставить себя на место другого.",cat:"empathy"},
-      {text:"Я внимательно слушаю собеседника, не перебивая.",cat:"empathy"},
-      {text:"Я умею разрешать конфликты, учитывая чувства обеих сторон.",cat:"social"},
-      {text:"Мне легко устанавливать контакт с новыми людьми.",cat:"social"},
-      {text:"Я могу вдохновить или поддержать человека словами.",cat:"social"}
+      {text:"I easily identify what I am feeling at any given moment.",cat:"self-awareness"},
+      {text:"I understand how my emotions influence my decisions.",cat:"self-awareness"},
+      {text:"I can accurately name my emotion (anger, sadness, anxiety, etc.).",cat:"self-awareness"},
+      {text:"I notice changes in my mood before they start affecting my behavior.",cat:"self-awareness"},
+      {text:"I know my strengths and weaknesses in communication.",cat:"self-awareness"},
+      {text:"I can calm down when I feel strong irritation.",cat:"self-regulation"},
+      {text:"I control impulsive reactions in stressful situations.",cat:"self-regulation"},
+      {text:"I can easily adapt to unexpected changes in plans.",cat:"self-regulation"},
+      {text:"I easily read other people's emotions from their facial expressions.",cat:"empathy"},
+      {text:"I feel when someone nearby is struggling, even if they remain silent.",cat:"empathy"},
+      {text:"I find it easy to put myself in someone else's shoes.",cat:"empathy"},
+      {text:"I listen attentively to my conversation partner without interrupting.",cat:"empathy"},
+      {text:"I know how to resolve conflicts while taking into account the feelings of both sides.",cat:"social"},
+      {text:"I find it easy to connect with new people.",cat:"social"},
+      {text:"I can inspire or support a person with my words.",cat:"social"}
     ]
   },
   {
-    id:"hads", title:"Шкала HADS", description:"Госпитальная шкала тревоги и депрессии для оценки вашего эмоционального состояния.", icon:"💜",
+    id:"hads", title:"HADS Scale", description:"Hospital Anxiety and Depression Scale to evaluate your emotional state.", icon:"💜",
     questions:[
-      {text:"Я испытываю напряжённость, мне не по себе.",cat:"anxiety"},
-      {text:"Я испытываю страх, кажется, будто что-то ужасное может вот-вот случиться.",cat:"anxiety"},
-      {text:"Беспокойные мысли крутятся у меня в голове.",cat:"anxiety"},
-      {text:"Я легко могу сесть и расслабиться.",cat:"anxiety"},
-      {text:"Я испытываю внутреннее напряжение или дрожь.",cat:"anxiety"},
-      {text:"Я чувствую неусидчивость, мне хочется постоянно двигаться.",cat:"anxiety"},
-      {text:"У меня бывает внезапное чувство паники.",cat:"anxiety"},
-      {text:"То, что приносило мне удовольствие, и сейчас вызывает такое же чувство.",cat:"depression"},
-      {text:"Я способен рассмеяться и увидеть забавную сторону событий.",cat:"depression"},
-      {text:"Я чувствую себя бодрым и энергичным.",cat:"depression"},
-      {text:"Мне кажется, что я стал делать всё очень медленно.",cat:"depression"},
-      {text:"Я не слежу за своей внешностью так, как раньше.",cat:"depression"},
-      {text:"Я с удовольствием предвкушаю предстоящие события.",cat:"depression"},
-      {text:"Я могу получить удовольствие от хорошей книги или фильма.",cat:"depression"}
+      {text:"I feel tense or wound up.",cat:"anxiety"},
+      {text:"I get a sort of frightened feeling as if something awful is about to happen.",cat:"anxiety"},
+      {text:"Worrying thoughts go through my mind.",cat:"anxiety"},
+      {text:"I can sit at ease and feel relaxed.",cat:"anxiety"},
+      {text:"I get a feeling of restlessness as if I have to be on the move.",cat:"anxiety"},
+      {text:"I feel restless and want to keep moving constantly.",cat:"anxiety"},
+      {text:"I get sudden feelings of panic.",cat:"anxiety"},
+      {text:"I still enjoy the things I used to enjoy.",cat:"depression"},
+      {text:"I can laugh and see the funny side of things.",cat:"depression"},
+      {text:"I feel cheerful and energetic.",cat:"depression"},
+      {text:"I feel as if I am slowed down.",cat:"depression"},
+      {text:"I have lost interest in my appearance.",cat:"depression"},
+      {text:"I look forward with enjoyment to things.",cat:"depression"},
+      {text:"I can enjoy a good book or radio/TV program.",cat:"depression"}
     ]
   },
   {
-    id:"sleep", title:"Тест качества сна", description:"Оцените гигиену сна и уровень дневной усталости для улучшения восстановления.", icon:"🌙",
+    id:"sleep", title:"Sleep Quality Test", description:"Evaluate your sleep hygiene and daytime fatigue levels to improve recovery.", icon:"🌙",
     questions:[
-      {text:"Мне трудно заснуть в течение 30 минут после того, как я лёг в кровать."},
-      {text:"Я просыпаюсь среди ночи и не могу заснуть обратно."},
-      {text:"Я просыпаюсь слишком рано утром и больше не могу уснуть."},
-      {text:"После пробуждения я чувствую себя разбитым и невыспавшимся."},
-      {text:"Днём я испытываю сильную сонливость и усталость."},
-      {text:"Я использую телефон или ноутбук в кровати перед сном."},
-      {text:"Я пью кофе или энергетики во второй половине дня."},
-      {text:"Мой режим сна нерегулярный — я засыпаю и встаю в разное время."},
-      {text:"Я чувствую раздражительность из-за недосыпа."},
-      {text:"Мне сложно сосредоточиться на задачах из-за усталости."}
+      {text:"I find it hard to fall asleep within 30 minutes after getting into bed."},
+      {text:"I wake up in the middle of the night and cannot fall back asleep."},
+      {text:"I wake up too early in the morning and cannot get back to sleep."},
+      {text:"After waking up, I feel exhausted and unrested."},
+      {text:"During the day, I experience strong drowsiness and fatigue."},
+      {text:"I use my phone or laptop in bed before sleep."},
+      {text:"I drink coffee or energy drinks in the second half of the day."},
+      {text:"My sleep schedule is irregular — I go to bed and wake up at different times."},
+      {text:"I feel irritable due to lack of sleep."},
+      {text:"I find it difficult to concentrate on tasks because of tiredness."}
     ]
   },
   {
     id: "burnout",
-    title: "Тест на выгорание (Burnout)",
-    description: "Оцените уровень эмоционального истощения, апатии и потери мотивации.",
+    title: "Burnout Test",
+    description: "Assess your level of emotional exhaustion, apathy, and loss of motivation.",
     icon: "🔥",
     questions: [
-      { text: "Я чувствую себя эмоционально истощённым на работе/в учёбе.", cat: "exhaustion" },
-      { text: "В конце дня я полностью обессилен и не хочу ничего делать.", cat: "exhaustion" },
-      { text: "Я стал менее энергичным и жизнерадостным, чем раньше.", cat: "exhaustion" },
-      { text: "Мне всё чаще хочется просто «отключиться» от всего.", cat: "exhaustion" },
-      { text: "Я отношусь к людям (коллегам, клиентам, близким) более цинично.", cat: "depersonalization" },
-      { text: "Мне стало безразлично, как идут дела у других.", cat: "depersonalization" },
-      { text: "Я чувствую, что люди вокруг меня раздражают меня сильнее обычного.", cat: "depersonalization" },
-      { text: "Я стал меньше сопереживать проблемам других.", cat: "depersonalization" },
-      { text: "Я сомневаюсь в своей компетентности и полезности.", cat: "accomplishment" },
-      { text: "Мне кажется, что мои усилия не приносят результата.", cat: "accomplishment" },
-      { text: "Я потерял интерес к тому, чем раньше гордился.", cat: "accomplishment" },
-      { text: "У меня пропала мотивация развиваться в своей сфере.", cat: "accomplishment" },
-      { text: "Я часто думаю: «Зачем я этим занимаюсь?»", cat: "accomplishment" }
+      { text: "I feel emotionally drained from my work or studies.", cat: "exhaustion" },
+      { text: "At the end of the day, I feel completely exhausted and don't want to do anything.", cat: "exhaustion" },
+      { text: "I have become less energetic and cheerful than I used to be.", cat: "exhaustion" },
+      { text: "More and more often, I just want to 'disconnect' from everything.", cat: "exhaustion" },
+      { text: "I treat people (colleagues, clients, loved ones) more cynically.", cat: "depersonalization" },
+      { text: "I have become indifferent to how others are doing.", cat: "depersonalization" },
+      { text: "I feel that people around me irritate me more than usual.", cat: "depersonalization" },
+      { text: "I empathize less with other people's problems.", cat: "depersonalization" },
+      { text: "I doubt my competence and usefulness.", cat: "accomplishment" },
+      { text: "I feel that my efforts do not bring any results.", cat: "accomplishment" },
+      { text: "I have lost interest in what I used to be proud of.", cat: "accomplishment" },
+      { text: "I have lost motivation to grow in my field.", cat: "accomplishment" },
+      { text: "I often think: 'Why am I doing this?'", cat: "accomplishment" }
     ]
   },
   {
     id: "selfesteem",
-    title: "Тест на самооценку (Розенберг)",
-    description: "Оцените уровень своей самооценки и уверенности в себе.",
+    title: "Self-Esteem Test (Rosenberg)",
+    description: "Evaluate your level of self-esteem and self-confidence.",
     icon: "🌟",
     questions: [
-      { text: "Я чувствую, что я человек, достойный уважения.", cat: "positive" },
-      { text: "У меня есть ряд хороших качеств.", cat: "positive" },
-      { text: "В целом я склонен считать себя неудачником.", cat: "negative" },
-      { text: "Я способен делать всё не хуже большинства других людей.", cat: "positive" },
-      { text: "Мне кажется, что у меня мало чем можно гордиться.", cat: "negative" },
-      { text: "Я отношусь к себе положительно.", cat: "positive" },
-      { text: "В целом я доволен собой.", cat: "positive" },
-      { text: "Мне хотелось бы уважать себя больше.", cat: "negative" },
-      { text: "Иногда я чувствую себя бесполезным.", cat: "negative" },
-      { text: "Я думаю, что я хороший человек.", cat: "positive" }
+      { text: "I feel that I am a person of worth, at least on an equal plane with others.", cat: "positive" },
+      { text: "I feel that I have a number of good qualities.", cat: "positive" },
+      { text: "All in all, I am inclined to feel that I am a failure.", cat: "negative" },
+      { text: "I am able to do things as well as most other people.", cat: "positive" },
+      { text: "I feel I do not have much to be proud of.", cat: "negative" },
+      { text: "I take a positive attitude toward myself.", cat: "positive" },
+      { text: "On the whole, I am satisfied with myself.", cat: "positive" },
+      { text: "I wish I could have more respect for myself.", cat: "negative" },
+      { text: "I certainly feel useless at times.", cat: "negative" },
+      { text: "I think I am a good person.", cat: "positive" }
     ]
   },
   {
     id: "distortions",
-    title: "Когнитивные искажения",
-    description: "Выявите типичные ошибки мышления, которые влияют на ваше настроение и решения.",
+    title: "Cognitive Distortions",
+    description: "Identify typical thinking errors that affect your mood and decisions.",
     icon: "🧩",
     questions: [
-      { text: "Если я ошибся — я полный неудачник.", cat: "all_or_nothing" },
-      { text: "Одна неудача значит, что у меня никогда ничего не получится.", cat: "overgeneralization" },
-      { text: "Я сосредотачиваюсь только на том, что пошло плохо, и игнорирую хорошее.", cat: "mental_filter" },
-      { text: "Я знаю, что другие люди думают обо мне плохо, даже если они этого не говорят.", cat: "mind_reading" },
-      { text: "Если что-то может пойти плохо — оно обязательно пойдёт плохо.", cat: "catastrophizing" },
-      { text: "Я должен/должна всё делать идеально, иначе я ни на что не гожусь.", cat: "should_statements" },
-      { text: "Я чувствую себя виноватым за то, в чём на самом деле не виноват.", cat: "personalization" },
-      { text: "Если я не самый лучший — значит я полный ноль.", cat: "all_or_nothing" },
-      { text: "Я всегда предсказываю негативный исход событий.", cat: "jumping_to_conclusions" },
-      { text: "Мои эмоции — это правда о реальности (если я чувствую себя неудачником, значит я им и являюсь).", cat: "emotional_reasoning" },
-      { text: "Я часто использую слова «всегда», «никогда», «никто», «все».", cat: "overgeneralization" },
-      { text: "Я обесцениваю свои успехи («это не считается», «мне просто повезло»).", cat: "disqualifying_positive" }
+      { text: "If I make a mistake, I am a total failure.", cat: "all_or_nothing" },
+      { text: "A single failure means I will never succeed at anything.", cat: "overgeneralization" },
+      { text: "I focus only on what went wrong and ignore the good.", cat: "mental_filter" },
+      { text: "I know that other people think poorly of me, even if they don't say it.", cat: "mind_reading" },
+      { text: "If something can go wrong, it definitely will.", cat: "catastrophizing" },
+      { text: "I must do everything perfectly, otherwise I am good for nothing.", cat: "should_statements" },
+      { text: "I feel guilty for things that are not actually my fault.", cat: "personalization" },
+      { text: "If I am not the absolute best, I am a total zero.", cat: "all_or_nothing" },
+      { text: "I always predict a negative outcome for events.", cat: "jumping_to_conclusions" },
+      { text: "My emotions reflect the absolute truth about reality (if I feel like a failure, I am one).", cat: "emotional_reasoning" },
+      { text: "I often use words like 'always', 'never', 'nobody', 'everyone'.", cat: "overgeneralization" },
+      { text: "I disqualify my successes ('that doesn't count', 'I just got lucky').", cat: "disqualifying_positive" }
     ]
   }
 ];
 const adviceDB = {
   eq:{
     low:[
-      {title:"Продолжайте практику",desc:"Ваш EQ высокий! Поддерживайте осознанность через ежедневную медитацию 10 минут.",icon:"🧘"},
-      {title:"Ментальный дневник",desc:"Ведите журнал благодарности — записывайте 3 вещи каждый вечер.",icon:"📓"},
-      {title:"Помогайте другим",desc:"Делитесь эмоциональными навыками — станьте наставником для близких.",icon:"🤝"}
+      {title:"Continue your practice",desc:"Your EQ is high! Maintain mindfulness through a daily 10-minute meditation.",icon:"🧘"},
+      {title:"Mental journal",desc:"Keep a gratitude journal — write down 3 things every evening.",icon:"📓"},
+      {title:"Help others",desc:"Share your emotional skills — become a mentor for your loved ones.",icon:"🤝"}
     ],
     moderate:[
-      {title:"Практика осознанности",desc:"Начните с 5-минутной медитации body scan каждое утро.",icon:"🧘"},
-      {title:"Активное слушание",desc:"Тренируйте умение слушать: повторяйте суть сказанного собеседником.",icon:"👂"},
-      {title:"Эмоциональный словарь",desc:"Расширяйте словарь эмоций — учитесь точнее называть свои чувства.",icon:"📖"}
+      {title:"Mindfulness practice",desc:"Start with a 5-minute body scan meditation every morning.",icon:"🧘"},
+      {title:"Active listening",desc:"Train your listening skills: summarize the key points of what your conversational partner said.",icon:"👂"},
+      {title:"Emotional vocabulary",desc:"Expand your emotional vocabulary — learn to label your feelings more precisely.",icon:"📖"}
     ],
     high:[
-      {title:"Дыхательная техника 4-7-8",desc:"Вдох 4 сек, задержка 7 сек, выдох 8 сек. Практикуйте при стрессе.",icon:"🌬️"},
-      {title:"Журнал эмоций",desc:"Записывайте свои эмоции 3 раза в день с описанием триггеров.",icon:"📝"},
-      {title:"Эмпатия через кино",desc:"Смотрите фильмы и пробуйте отслеживать эмоции персонажей.",icon:"🎬"}
+      {title:"4-7-8 Breathing technique",desc:"Inhale for 4 seconds, hold for 7 seconds, exhale for 8 seconds. Practice during stress.",icon:"🌬️"},
+      {title:"Emotion log",desc:"Log your emotions 3 times a day along with their triggers.",icon:"📝"},
+      {title:"Empathy through movies",desc:"Watch movies and try to track the characters' emotions.",icon:"🎬"}
     ],
     critical:[
-      {title:"Консультация психолога",desc:"Обратитесь к специалисту для развития эмоциональных навыков.",icon:"💬"},
-      {title:"Базовая саморегуляция",desc:"Начните с техники «СТОП»: Стой, Тихо, Ощути, Подумай.",icon:"🛑"},
-      {title:"Социальные навыки",desc:"Практикуйте простое общение: здоровайтесь, спрашивайте «как дела».",icon:"👋"}
+      {title:"Psychologist consultation",desc:"Consult a specialist to develop your emotional skills.",icon:"💬"},
+      {title:"Basic self-regulation",desc:"Start with the 'STOP' technique: Stop, Take a breath, Observe, Proceed.",icon:"🛑"},
+      {title:"Social skills",desc:"Practice simple interaction: say hello, ask how people are doing.",icon:"👋"}
     ]
   },
   hads:{
     low:[
-      {title:"Поддерживайте баланс",desc:"Ваше состояние стабильно! Продолжайте заботиться о ментальном здоровье.",icon:"✨"},
-      {title:"Физическая активность",desc:"30 минут ходьбы или лёгких упражнений поддерживают настроение.",icon:"🚶"},
-      {title:"Социальные связи",desc:"Проводите время с близкими — это лучшая профилактика тревоги.",icon:"❤️"}
+      {title:"Maintain balance",desc:"Your state is stable! Continue caring for your mental health.",icon:"✨"},
+      {title:"Physical activity",desc:"30 minutes of walking or light exercise boosts your mood.",icon:"🚶"},
+      {title:"Social connections",desc:"Spend time with loved ones — it is the best prevention against anxiety.",icon:"❤️"}
     ],
     moderate:[
-      {title:"Прогрессивная релаксация",desc:"Напрягайте и расслабляйте мышцы от стоп до головы перед сном.",icon:"💆"},
-      {title:"Ограничьте новости",desc:"Сократите потребление новостей до 15 минут в день.",icon:"📵"},
-      {title:"Режим дня",desc:"Стабильный распорядок снижает уровень тревоги на 30%.",icon:"⏰"}
+      {title:"Progressive relaxation",desc:"Tense and relax your muscles from feet to head before sleep.",icon:"💆"},
+      {title:"Limit news intake",desc:"Reduce news consumption to 15 minutes a day.",icon:"📵"},
+      {title:"Daily routine",desc:"A stable schedule reduces anxiety levels by up to 30%.",icon:"⏰"}
     ],
     high:[
-      {title:"Когнитивная перестройка",desc:"Записывайте тревожные мысли и ищите альтернативные объяснения.",icon:"🔄"},
-      {title:"Заземление 5-4-3-2-1",desc:"Назовите 5 вещей видите, 4 слышите, 3 чувствуете, 2 нюхаете, 1 вкус.",icon:"🌍"},
-      {title:"Обратитесь за помощью",desc:"Поговорите с психологом — тревога хорошо поддаётся терапии.",icon:"🩺"}
+      {title:"Cognitive restructuring",desc:"Write down anxious thoughts and search for alternative explanations.",icon:"🔄"},
+      {title:"5-4-3-2-1 Grounding",desc:"Name 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste.",icon:"🌍"},
+      {title:"Seek help",desc:"Talk to a psychologist — anxiety responds very well to therapy.",icon:"🩺"}
     ],
     critical:[
-      {title:"Срочная помощь",desc:"Обратитесь к психотерапевту. Позвоните на линию помощи: 8-800-2000-122.",icon:"🆘"},
-      {title:"Простые шаги",desc:"Начните с малого: тёплый душ, стакан воды, 5 глубоких вдохов.",icon:"🫧"},
-      {title:"Не оставайтесь одни",desc:"Свяжитесь с близким человеком и поделитесь своим состоянием.",icon:"📞"}
+      {title:"Urgent support",desc:"Reach out to a therapist. Call a helpline: 8-800-2000-122.",icon:"🆘"},
+      {title:"Simple steps",desc:"Start small: a warm shower, a glass of water, 5 deep breaths.",icon:"🫧"},
+      {title:"Don't stay alone",desc:"Reach out to a loved one and share how you feel.",icon:"📞"}
     ]
   },
   sleep:{
     low:[
-      {title:"Отличная гигиена сна!",desc:"Продолжайте соблюдать режим — вы хорошо восстанавливаетесь.",icon:"🌟"},
-      {title:"Утренний свет",desc:"15 минут яркого света утром укрепляют циркадный ритм.",icon:"☀️"},
-      {title:"Благодарность перед сном",desc:"Подумайте о 3 хороших моментах дня перед засыпанием.",icon:"🙏"}
+      {title:"Excellent sleep hygiene!",desc:"Keep maintaining your schedule — your body is recovering well.",icon:"🌟"},
+      {title:"Morning light",desc:"15 minutes of bright sunlight in the morning strengthens your circadian rhythm.",icon:"☀️"},
+      {title:"Bedtime gratitude",desc:"Think about 3 good moments of your day before falling asleep.",icon:"🙏"}
     ],
     moderate:[
-      {title:"Цифровой закат",desc:"Уберите экраны за 1 час до сна или включите ночной режим.",icon:"📱"},
-      {title:"Ритуал вечера",desc:"Создайте 20-минутный ритуал: чтение → растяжка → дыхание.",icon:"🌸"},
-      {title:"Температура спальни",desc:"Оптимальная температура для сна — 18-20°C.",icon:"🌡️"}
+      {title:"Digital sunset",desc:"Put away screens 1 hour before sleep or turn on night mode.",icon:"📱"},
+      {title:"Evening ritual",desc:"Create a 20-minute ritual: reading → stretching → breathing.",icon:"🌸"},
+      {title:"Bedroom temperature",desc:"The optimal temperature for sleep is 18-20°C (64-68°F).",icon:"🌡️"}
     ],
     high:[
-      {title:"Фиксированный режим",desc:"Ложитесь и вставайте в одно время, даже в выходные.",icon:"📅"},
-      {title:"Кофеин до 14:00",desc:"Исключите кофе, чай и энергетики после обеда.",icon:"☕"},
-      {title:"Медитация для сна",desc:"Попробуйте Yoga Nidra — глубокое расслабление за 20 минут.",icon:"🧘"}
+      {title:"Fixed schedule",desc:"Go to bed and wake up at the same time, even on weekends.",icon:"📅"},
+      {title:"Caffeine until 2:00 PM",desc:"Avoid coffee, tea, and energy drinks after lunch.",icon:"☕"},
+      {title:"Sleep meditation",desc:"Try Yoga Nidra — deep relaxation in 20 minutes.",icon:"🧘"}
     ],
     critical:[
-      {title:"Обратитесь к сомнологу",desc:"Хронические нарушения сна требуют профессиональной помощи.",icon:"🏥"},
-      {title:"Дневник сна",desc:"2 недели записывайте время сна, пробуждений и самочувствие.",icon:"📋"},
-      {title:"Кровать = только сон",desc:"Не работайте и не смотрите видео в кровати — переучите мозг.",icon:"🛏️"}
+      {title:"Consult a sleep specialist",desc:"Chronic sleep disorders require professional help.",icon:"🏥"},
+      {title:"Sleep diary",desc:"Keep track of your sleep time, awakenings, and well-being for 2 weeks.",icon:"📋"},
+      {title:"Bed = Sleep only",desc:"Do not work or watch videos in bed — retrain your brain.",icon:"🛏️"}
     ]
   },
   burnout: {
     low: [
-      { title: "Отличный результат!", desc: "Вы в хорошей форме. Продолжайте балансировать работу и отдых.", icon: "🌟" },
-      { title: "Профилактика", desc: "Раз в неделю устраивайте полный цифровой детокс.", icon: "📴" },
-      { title: "Ресурсы", desc: "Ведите список маленьких побед — это укрепляет мотивацию.", icon: "🏆" }
+      { title:"Great result!", desc:"You are in good shape. Continue balancing work and rest.", icon:"🌟" },
+      { title:"Prevention", desc:"Arrange a complete digital detox once a week.", icon:"📴" },
+      { title:"Resources", desc:"Keep a list of small wins — it boosts your motivation.", icon:"🏆" }
     ],
     moderate: [
-      { title: "Границы", desc: "Научитесь говорить «нет» и защищать своё время.", icon: "🛡️" },
-      { title: "Восстановление", desc: "Вводите обязательные 1–2 дня полного отдыха в месяц.", icon: "🌿" },
-      { title: "Хобби", desc: "Верните в жизнь занятие, которое приносит чистую радость.", icon: "🎨" }
+      { title:"Boundaries", desc:"Learn to say 'no' and protect your time.", icon:"🛡️" },
+      { title:"Recovery", desc:"Incorporate 1–2 mandatory days of full rest every month.", icon:"🌿" },
+      { title:"Hobbies", desc:"Bring back an activity that brings you pure joy.", icon:"🎨" }
     ],
     high: [
-      { title: "Срочные меры", desc: "Сократите нагрузку. Обратитесь к психологу.", icon: "⚠️" },
-      { title: "Техника 80/20", desc: "Сосредоточьтесь только на самых важных задачах.", icon: "🎯" },
-      { title: "Отпуск", desc: "Запланируйте хотя бы короткий перерыв в ближайшие 2 недели.", icon: "✈️" }
+      { title:"Urgent measures", desc:"Reduce your workload. Consider seeing a therapist.", icon:"⚠️" },
+      { title:"80/20 Rule", desc:"Focus only on the most important tasks.", icon:"🎯" },
+      { title:"Vacation", desc:"Plan at least a short break within the next 2 weeks.", icon:"✈️" }
     ],
     critical: [
-      { title: "Профессиональная помощь", desc: "Обратитесь к специалисту как можно скорее.", icon: "🆘" },
-      { title: "Полный reset", desc: "Рассмотрите возможность временно снизить нагрузку или взять отпуск.", icon: "🔄" },
-      { title: "Поддержка", desc: "Расскажите близким — не держите всё в себе.", icon: "🤝" }
+      { title:"Professional help", desc:"Reach out to a specialist as soon as possible.", icon:"🆘" },
+      { title:"Full reset", desc:"Consider temporarily reducing your load or taking time off.", icon:"🔄" },
+      { title:"Support", desc:"Talk to loved ones — don't keep everything inside.", icon:"🤝" }
     ]
   },
-    selfesteem: {
+  selfesteem: {
     low: [
-      { title: "Работа над собой", desc: "Начните с ежедневных аффирмаций и списка своих сильных сторон.", icon: "📝" },
-      { title: "Маленькие победы", desc: "Ведите дневник достижений — даже самых незначительных.", icon: "🏆" },
-      { title: "Окружение", desc: "Проводите больше времени с людьми, которые вас поддерживают.", icon: "❤️" }
+      { title:"Self-improvement", desc:"Start with daily affirmations and a list of your strengths.", icon:"📝" },
+      { title:"Small wins", desc:"Keep an achievement journal — even for the smallest things.", icon:"🏆" },
+      { title:"Environment", desc:"Spend more time with people who encourage and support you.", icon:"❤️" }
     ],
     moderate: [
-      { title: "Укрепление уверенности", desc: "Практикуйте выход из зоны комфорта: пробуйте новое.", icon: "🚀" },
-      { title: "Самосострадание", desc: "Относитесь к себе с такой же добротой, как к лучшему другу.", icon: "🤗" },
-      { title: "Физическая активность", desc: "Регулярные занятия спортом значительно повышают самооценку.", icon: "🏃" }
+      { title:"Building confidence", desc:"Practice stepping outside your comfort zone: try new things.", icon:"🚀" },
+      { title:"Self-compassion", desc:"Treat yourself with the same kindness as you would your best friend.", icon:"🤗" },
+      { title:"Physical activity", desc:"Regular exercise significantly improves self-esteem.", icon:"🏃" }
     ],
     high: [
-      { title: "Отличная самооценка!", desc: "Вы хорошо относитесь к себе. Продолжайте в том же духе.", icon: "🌟" },
-      { title: "Поддержка других", desc: "Делитесь своей уверенностью — помогайте друзьям.", icon: "🤝" },
-      { title: "Развитие", desc: "Ставьте амбициозные цели — ваша самооценка это выдержит.", icon: "🎯" }
+      { title:"Great self-esteem!", desc:"You have a healthy attitude toward yourself. Keep it up.", icon:"🌟" },
+      { title:"Supporting others", desc:"Share your confidence — support your friends.", icon:"🤝" },
+      { title:"Growth", desc:"Set ambitious goals — your self-esteem can handle it.", icon:"🎯" }
     ],
     critical: []
   },
-    distortions: {
+  distortions: {
     low: [
-      { title: "Отличный результат!", desc: "У вас здоровое мышление. Продолжайте практиковать осознанность.", icon: "🌟" }
+      { title:"Great result!", desc:"You have a healthy mindset. Continue practicing mindfulness.", icon:"🌟" }
     ],
     moderate: [
-      { title: "Техника «Проверка фактов»", desc: "Спрашивайте себя: «Какие есть доказательства за и против этой мысли?»", icon: "🔍" },
-      { title: "Переформулировка", desc: "Заменяйте «я неудачник» на «я сделал ошибку и могу научиться».", icon: "📝" },
-      { title: "Дневник искажений", desc: "Записывайте автоматические мысли и ищите в них искажения.", icon: "📓" }
+      { title:"'Fact Checking' technique", desc:"Ask yourself: 'What evidence supports or contradicts this thought?'", icon:"🔍" },
+      { title:"Reframing", desc:"Replace 'I am a failure' with 'I made a mistake and I can learn from it.'", icon:"📝" },
+      { title:"Distortion journal", desc:"Write down automatic thoughts and look for distortions within them.", icon:"📓" }
     ],
     high: [
-      { title: "Работа с искажениями", desc: "Самые частые у вас — catastrophizing и all-or-nothing. Начните с них.", icon: "⚠️" },
-      { title: "Эксперименты поведения", desc: "Проверяйте свои страшные прогнозы на практике.", icon: "🧪" },
-      { title: "MindMirror AI", desc: "Регулярно используйте чат для разбора автоматических мыслей.", icon: "🪞" }
+      { title:"Addressing distortions", desc:"Your most common ones are catastrophizing and all-or-nothing thinking. Start with those.", icon:"⚠️" },
+      { title:"Behavioral experiments", desc:"Test your scary predictions in practice.", icon:"🧪" },
+      { title:"MindMirror AI", desc:"Regularly use the chat to analyze automatic thoughts.", icon:"🪞" }
     ],
     critical: [
-      { title: "Рекомендуется консультация", desc: "Большое количество искажений сильно влияет на настроение. Поговорите со специалистом.", icon: "🧑‍⚕️" }
+      { title:"Consultation recommended", desc:"A high level of distortions heavily impacts your mood. Talk to a specialist.", icon:"🧑‍⚕️" }
     ]
   }
 };
 const catNames = {
-  "self-awareness":"Самосознание",
-  "self-regulation":"Саморегуляция",
-  "empathy":"Эмпатия",
-  "social":"Социальные навыки",
-  "anxiety":"Тревога",
-  "depression":"Депрессия",
-  "exhaustion": "Эмоциональное истощение",
-  "depersonalization": "Деперсонализация",
-  "accomplishment": "Снижение достижений",
-  "positive": "Позитивные утверждения",
-  "negative": "Обратные утверждения",
-  "all_or_nothing": "Чёрно-белое мышление",
-  "overgeneralization": "Сверхобобщение",
-  "mental_filter": "Ментальный фильтр",
-  "mind_reading": "Чтение мыслей",
-  "catastrophizing": "Катастрофизация",
-  "should_statements": "Долженствования",
-  "personalization": "Персонализация",
-  "jumping_to_conclusions": "Поспешные выводы",
-  "emotional_reasoning": "Эмоциональное мышление",
-  "disqualifying_positive": "Обесценивание позитивного"}
+  "self-awareness":"Self-Awareness",
+  "self-regulation":"Self-Regulation",
+  "empathy":"Empathy",
+  "social":"Social Skills",
+  "anxiety":"Anxiety",
+  "depression":"Depression",
+  "exhaustion": "Emotional Exhaustion",
+  "depersonalization": "Depersonalization",
+  "accomplishment": "Reduced Personal Accomplishment",
+  "positive": "Positive Statements",
+  "negative": "Reversed Statements",
+  "all_or_nothing": "All-or-Nothing Thinking",
+  "overgeneralization": "Overgeneralization",
+  "mental_filter": "Mental Filter",
+  "mind_reading": "Mind Reading",
+  "catastrophizing": "Catastrophizing",
+  "should_statements": "'Should' Statements",
+  "personalization": "Personalization",
+  "jumping_to_conclusions": "Jumping to Conclusions",
+  "emotional_reasoning": "Emotional Reasoning",
+  "disqualifying_positive": "Disqualifying the Positive"
+};
 const levelEmoji = {low:"🟢",moderate:"🟡",high:"🟠",critical:"🔴"};
 const levelColors = {low:"#22c55e",moderate:"#eab308",high:"#f97316",critical:"#ef4444"};
 const verdictColors = {low:"color:#22c55e",moderate:"color:#eab308",high:"color:#f97316",critical:"color:#ef4444"};
@@ -1019,7 +1025,6 @@ let currentTest = null;
 let currentQ = 0;
 let currentAnswers = [];
 let moodChart = null;
-
 // ===== CONFIG =====
 const SERVER_URL = window.location.origin;
 // REGISTER
@@ -1057,18 +1062,18 @@ async function handleRegister(e) {
       saveUser({name, email, createdAt: new Date().toISOString()});
       enterApp();
     } else {
-      document.getElementById("auth-message").textContent = data.error || "Ошибка регистрации";
-      document.getElementById("auth-message").classList.remove("hidden");
-    }
-  } catch(e) {
-    document.getElementById("auth-message").textContent = "Сервер не отвечает. Убедись, что server.js запущен.";
+    document.getElementById("auth-message").textContent = data.error || "Registration error";
     document.getElementById("auth-message").classList.remove("hidden");
-    console.error(e);
   }
-  return false;
+} catch(e) {
+  document.getElementById("auth-message").textContent = "Server is not responding. Make sure server.js is running.";
+  document.getElementById("auth-message").classList.remove("hidden");
+  console.error(e);
+}
+return false;
 }
 
-// LOGIN (улучшенная версия с очисткой старых данных)
+// LOGIN (improved version with clearing of old data)
 async function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById("login-email").value.trim();
@@ -1079,13 +1084,13 @@ async function handleLogin(e) {
     if (el.id === "auth-message") el.textContent = "";
   });
 
-  if (!email.includes("@")) {
-    document.getElementById("err-login-email").textContent = "Введите корректный email";
+ if (!email.includes("@")) {
+    document.getElementById("err-login-email").textContent = "Please enter a valid email address";
     document.getElementById("err-login-email").classList.remove("hidden");
     return false;
   }
   if (!password) {
-    document.getElementById("err-login-password").textContent = "Введите пароль";
+    document.getElementById("err-login-password").textContent = "Please enter a password";
     document.getElementById("err-login-password").classList.remove("hidden");
     return false;
   }
@@ -1104,14 +1109,12 @@ async function handleLogin(e) {
     if (data.success) {
       const targetEmail = data.email;
 
-      // УДАЛЯЕМ истории ТОЛЬКО других пользователей (если вдруг сменил аккаунт)
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith("mindmirror_history_") && !key.includes(targetEmail)) {
           localStorage.removeItem(key);
         }
       });
 
-      // Сохраняем текущего пользователя
       saveUser({ 
         name: data.name, 
         email: data.email, 
@@ -1138,7 +1141,6 @@ function showScreen(id){
   const screen = document.getElementById("screen-" + id);
   if (screen) screen.classList.add("active");
 
-  // Подсветка в сайдбаре
   const navBtn = document.getElementById("nav-" + id);
   if (navBtn) navBtn.classList.add("active");
 
@@ -1162,19 +1164,19 @@ function showScreen(id){
 function renderDashboard(){
   const user=getUser();if(!user)return;
   const h=new Date().getHours();
-  const gr=h<12?"Доброе утро":h<18?"Добрый день":"Добрый вечер";
+  const gr=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
   document.getElementById("greeting").textContent=gr;
   document.getElementById("dash-name").textContent=user.name;
   document.getElementById("nav-username").textContent=user.name;
   const history=getHistory();
   const last=history[history.length-1];
-  document.getElementById("dash-subtitle").textContent=last?`Последний тест: ${last.testTitle} — ${last.verdict}`:"Пройдите первый тест, чтобы узнать о себе больше.";
+  document.getElementById("dash-subtitle").textContent=last?`Last test: ${last.testTitle} — ${last.verdict}`:"Take your first test to learn more about yourself.";
   document.getElementById("stat-count").textContent=history.length;
   document.getElementById("stat-mood").textContent=last?last.mood+"/10":"—/10";
   renderMoodChart(history);
 }
 function renderMoodChart(history){
-  const days=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"];
+  const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
   let data;
   if(history.length===0){data=days.map(()=>Math.floor(Math.random()*3)+5)}
   else{const last7=history.slice(-7);data=days.map((_,i)=>last7[i]?last7[i].mood:Math.floor(Math.random()*3)+5)}
@@ -1239,7 +1241,6 @@ function handleAnswer(val){
   else{finishTest()}
 }
 // ===== ANALYSIS =====
-// ===== ANALYSIS =====
 function analyzeResult(testId, answers){
   const test = tests.find(t => t.id === testId);
   const total = answers.reduce((a, b) => a + b, 0);
@@ -1258,10 +1259,10 @@ function analyzeResult(testId, answers){
     });
     const pct = total / max * 100;
     let verdict, level, mood;
-    if(pct >= 80){ verdict = "Высокий EQ — Пик эмоциональной зрелости"; level = "low"; mood = 9; }
-    else if(pct >= 60){ verdict = "Хороший EQ — Стабильное эмоциональное состояние"; level = "moderate"; mood = 7; }
-    else if(pct >= 40){ verdict = "Средний EQ — Есть потенциал для роста"; level = "high"; mood = 5; }
-    else{ verdict = "Низкий EQ — Рекомендуется развитие навыков"; level = "critical"; mood = 3; }
+    if(pct >= 80){ verdict = "High EQ — Peak emotional maturity"; level = "low"; mood = 9; }
+    else if(pct >= 60){ verdict = "Good EQ — Stable emotional state"; level = "moderate"; mood = 7; }
+    else if(pct >= 40){ verdict = "Average EQ — Potential for growth"; level = "high"; mood = 5; }
+    else{ verdict = "Low EQ — Skill development recommended"; level = "critical"; mood = 3; }
     return { testId, testTitle: test.title, totalScore: total, maxScore: max, verdict, level, details, mood };
   }
 
@@ -1275,20 +1276,20 @@ function analyzeResult(testId, answers){
     const mx = 56;
     const details = { anxiety: anx, depression: dep };
     let verdict, level, mood;
-    if(t2 <= 10){ verdict = "Норма — Эмоциональное состояние стабильно"; level = "low"; mood = 8; }
-    else if(t2 <= 18){ verdict = "Субклинический уровень — Лёгкая тревожность"; level = "moderate"; mood = 6; }
-    else if(t2 <= 28){ verdict = "Клинически выраженная тревога/депрессия"; level = "high"; mood = 4; }
-    else{ verdict = "Глубокое истощение — Рекомендуется помощь специалиста"; level = "critical"; mood = 2; }
+   if(t2 <= 10){ verdict = "Normal — Emotional state is stable"; level = "low"; mood = 8; }
+    else if(t2 <= 18){ verdict = "Subclinical level — Mild anxiety"; level = "moderate"; mood = 6; }
+    else if(t2 <= 28){ verdict = "Clinically significant anxiety/depression"; level = "high"; mood = 4; }
+    else{ verdict = "Deep exhaustion — Specialist help recommended"; level = "critical"; mood = 2; }
     return { testId, testTitle: test.title, totalScore: t2, maxScore: mx, verdict, level, details, mood };
   }
 
   if(testId === "sleep"){
     const pct = total / max * 100;
     let verdict, level, mood;
-    if(pct <= 20){ verdict = "Отличный сон — Высокое восстановление"; level = "low"; mood = 9; }
-    else if(pct <= 45){ verdict = "Удовлетворительный сон — Незначительные нарушения"; level = "moderate"; mood = 6; }
-    else if(pct <= 70){ verdict = "Нарушения сна — Средний уровень усталости"; level = "high"; mood = 4; }
-    else{ verdict = "Тяжёлые нарушения сна — Хроническое истощение"; level = "critical"; mood = 2; }
+    if(pct <= 20){ verdict = "Excellent sleep — High recovery"; level = "low"; mood = 9; }
+    else if(pct <= 45){ verdict = "Satisfactory sleep — Minor disturbances"; level = "moderate"; mood = 6; }
+    else if(pct <= 70){ verdict = "Sleep disturbances — Moderate fatigue level"; level = "high"; mood = 4; }
+    else{ verdict = "Severe sleep disturbances — Chronic exhaustion"; level = "critical"; mood = 2; }
     return { testId, testTitle: test.title, totalScore: total, maxScore: max, verdict, level, mood };
   }
 
@@ -1303,29 +1304,29 @@ function analyzeResult(testId, answers){
 
     let verdict, level, mood;
     if (pct <= 25) { 
-      verdict = "Низкий уровень выгорания — вы в хорошей форме"; 
+      verdict = "Low burnout level — you are in good shape"; 
       level = "low"; 
       mood = 9; 
     }
     else if (pct <= 50) { 
-      verdict = "Умеренное выгорание — пора уделить себе внимание"; 
+      verdict = "Moderate burnout — time to pay attention to yourself"; 
       level = "moderate"; 
       mood = 6; 
     }
     else if (pct <= 75) { 
-      verdict = "Высокий уровень выгорания"; 
+      verdict = "High burnout level"; 
       level = "high"; 
       mood = 3; 
     }
     else { 
-      verdict = "Критическое выгорание — нужна срочная помощь"; 
+      verdict = "Critical burnout — urgent help needed"; 
       level = "critical"; 
       mood = 1; 
     }
 
     return {
       testId,
-      testTitle: "Тест на выгорание (Burnout)",
+      testTitle: "Burnout Test",
       totalScore,
       maxScore,
       verdict,
@@ -1352,24 +1353,24 @@ function analyzeResult(testId, answers){
     const maxScore = 40;
     let verdict, level, mood;
     if (score >= 30) { 
-      verdict = "Высокая самооценка — вы уверены в себе"; 
+      verdict = "High self-esteem — you are confident in yourself"; 
       level = "high"; 
       mood = 9; 
     }
     else if (score >= 20) { 
-      verdict = "Средняя самооценка — есть над чем поработать"; 
+      verdict = "Average self-esteem — there is room for improvement"; 
       level = "moderate"; 
       mood = 6; 
     }
     else { 
-      verdict = "Низкая самооценка — важно работать над собой"; 
+      verdict = "Low self-esteem — working on yourself is important"; 
       level = "low"; 
       mood = 3; 
     }
 
     return {
       testId,
-      testTitle: "Тест на самооценку (Розенберг)",
+      testTitle: "Self-Esteem Test (Rosenberg)",
       totalScore: score,
       maxScore,
       verdict,
@@ -1392,16 +1393,16 @@ function analyzeResult(testId, answers){
     const pct = Math.round((totalScore / maxScore) * 100);
 
     let verdict, level, mood;
-    if (pct <= 25) { verdict = "Низкий уровень искажений — мышление здоровое"; level = "low"; mood = 9; }
-    else if (pct <= 50) { verdict = "Умеренное количество искажений"; level = "moderate"; mood = 6; }
-    else if (pct <= 75) { verdict = "Высокий уровень когнитивных искажений"; level = "high"; mood = 3; }
-    else { verdict = "Очень высокий уровень — важно работать с мышлением"; level = "critical"; mood = 2; }
+    if (pct <= 25) { verdict = "Low level of distortions — thinking is healthy"; level = "low"; mood = 9; }
+    else if (pct <= 50) { verdict = "Moderate amount of distortions"; level = "moderate"; mood = 6; }
+    else if (pct <= 75) { verdict = "High level of cognitive distortions"; level = "high"; mood = 3; }
+    else { verdict = "Very high level — essential to work on your mindset"; level = "critical"; mood = 2; }
 
     const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0,3);
 
     return {
       testId,
-      testTitle: "Когнитивные искажения",
+      testTitle: "Cognitive Distortions",
       totalScore,
       maxScore,
       verdict,
@@ -1411,18 +1412,19 @@ function analyzeResult(testId, answers){
     };
   }
 
-  // Если тест не найден
-  return { testId, testTitle: "Неизвестный тест", totalScore: 0, maxScore: 100, verdict: "Ошибка анализа", level: "moderate", mood: 5 };
+  // If test is not found
+  return { testId, testTitle: "Unknown test", totalScore: 0, maxScore: 100, verdict: "Analysis error", level: "moderate", mood: 5 };
 }
+
 async function finishTest() {
   const result = analyzeResult(currentTest.id, currentAnswers);
   result.date = new Date().toISOString();
   saveResult(result);
 
-  // === ОТПРАВКА В БД (не блокируем отображение результатов!) ===
+  // === SEND TO DB (do not block results display!) ===
   const user = getUser();
   if (user && user.email) {
-    // Запускаем отправку в фоне, НЕ ждём её
+    // Run sending in the background, DO NOT await it
     fetch(`${SERVER_URL}/api/save-result`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 
@@ -1437,15 +1439,15 @@ async function finishTest() {
       })
     })
     .then(response => {
-      if (response.ok) console.log("✅ Данные успешно отправлены в SQL!");
-      else console.log("⚠️ Сервер вернул ошибку:", response.status);
+      if (response.ok) console.log("✅ Data successfully sent to SQL!");
+      else console.log("⚠️ Server returned an error:", response.status);
     })
     .catch(e => {
-      console.log("⚠️ Сервер не ответил (работает только локально или проверь CORS)");
+      console.log("⚠️ Server did not respond (works only locally or check CORS)");
     });
   }
 
-  // === ВСЕГДА показываем результаты ===
+  // === ALWAYS show results ===
   renderResults(result);
   showScreen("results");
 }
@@ -1501,13 +1503,13 @@ function renderAccount() {
     document.getElementById("account-name").textContent = user.name;
     document.getElementById("account-email").textContent = user.email;
     document.getElementById("account-date").textContent = 
-        "Зарегистрирован: " + new Date(user.createdAt).toLocaleDateString("ru-RU");
+        "Registered: " + new Date(user.createdAt).toLocaleDateString("ru-RU");
 
     // История тестов
     const history = getHistory();
     const list = document.getElementById("history-list");
     if (history.length === 0) {
-        list.innerHTML = '<p class="text-gray-500 text-sm">Вы ещё не прошли ни одного теста.</p>';
+        list.innerHTML = '<p class="text-gray-500 text-sm">You haven't taken any tests yet.</p>';
     } else {
         list.innerHTML = history.slice().reverse().map(r => `
             <div class="history-item">
@@ -1528,7 +1530,7 @@ function renderAccount() {
 }
 // ===== LOGOUT =====
 function handleLogout(){
-    if(confirm("Выйти из аккаунта?")) {
+    if(confirm("Log out of your account?")) {
         localStorage.removeItem("mindmirror_user");
         showAuthScreen();
     }
@@ -1558,19 +1560,19 @@ function showAuthScreen(){
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ Страница загружена");
+    console.log("✅ Page loaded");
 
-    // Принудительно очищаем старые данные (для теста)
-    // localStorage.removeItem("mindmirror_user");   // ← раскомментируй если нужно
+    // Force clear old data (for testing)
+    // localStorage.removeItem("mindmirror_user");   // ← uncomment if needed
 
     const user = getUser();
-    console.log("Пользователь в localStorage:", user);
+    console.log("User in localStorage:", user);
 
     if (user && user.email) {
-        console.log("→ Заходим в приложение");
+        console.log("→ Entering application");
         enterApp();
     } else {
-        console.log("→ Показываем экран авторизации");
+        console.log("→ Showing authorization screen");
         showAuthScreen();
     }
 
@@ -1606,7 +1608,7 @@ async function handleContact(e) {
     const originalBtnText = btn.textContent;
 
     btn.disabled = true;
-    btn.textContent = 'Отправляем...';
+    btn.textContent = 'Sending...';
 
     const name = document.getElementById('support-name').value.trim();
     const email = document.getElementById('support-email').value.trim();
@@ -1614,7 +1616,7 @@ async function handleContact(e) {
     const message = document.getElementById('support-message').value.trim();
 
     if (!subject || !message) {
-        statusEl.innerHTML = '<span class="text-red-500">Пожалуйста, заполните тему и сообщение</span>';
+        statusEl.innerHTML = '<span class="text-red-500">Please fill in the subject and message</span>';
         btn.disabled = false;
         btn.textContent = originalBtnText;
         return false;
@@ -1636,23 +1638,21 @@ async function handleContact(e) {
             statusEl.innerHTML = `<span class="text-green-600 font-medium">${data.message}</span>`;
             e.target.reset(); // очищаем форму
         } else {
-            statusEl.innerHTML = `<span class="text-red-500">${data.error || 'Ошибка при отправке'}</span>`;
+            statusEl.innerHTML = `<span class="text-red-500">${data.error || 'Error sending message'}</span>`;
         }
     } catch (err) {
         console.error(err);
-        statusEl.innerHTML = `<span class="text-red-500">Не удалось подключиться к серверу</span>`;
+        statusEl.innerHTML = `<span class="text-red-500">Failed to connect to the server</span>`;
     }
 
     btn.disabled = false;
     btn.textContent = originalBtnText;
     return false;
 }
-// === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ПРОФИЛЯ ===
 let currentUserEmail = null;
 let currentUserName = null;
 let currentAvatarBase64 = null;
 
-// === ЗАГРУЗКА ДАННЫХ ПРОФИЛЯ ===
 async function loadUserProfile() {
     const user = getUser();
     if (!user || !user.email) return;
@@ -1660,10 +1660,8 @@ async function loadUserProfile() {
     currentUserEmail = user.email;
     currentUserName = user.name;
 
-    // Загружаем аватар
     currentAvatarBase64 = localStorage.getItem(`avatar_${user.email}`) || null;
 
-    // Показываем аватар, если он есть
     if (currentAvatarBase64) {
         const avatarEl = document.getElementById('account-avatar');
         avatarEl.style.backgroundImage = `url(${currentAvatarBase64})`;
@@ -1673,7 +1671,6 @@ async function loadUserProfile() {
     }
 }
 
-// === ФУНКЦИИ РЕДАКТИРОВАНИЯ ПРОФИЛЯ ===
 
 function triggerAvatarUpload() {
     document.getElementById('edit-avatar').click();
@@ -1686,7 +1683,6 @@ async function editProfile() {
     currentUserEmail = user.email;
     currentUserName = user.name;
 
-    // Заполняем только имя
     document.getElementById('edit-name').value = currentUserName || '';
     document.getElementById('edit-avatar').value = ''; // сбрасываем файл
 
@@ -1704,13 +1700,13 @@ function closeEditModal() {
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         if (file.size > 2 * 1024 * 1024) {
-            alert('Файл слишком большой! Максимум 10 МБ.');
+            alert('File is too large! Maximum 10 MB.');
             reject(new Error('File too large'));
             return;
         }
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+        reader.onerror = () => reject(new Error('File reading error'));
         reader.readAsDataURL(file);
     });
 }
@@ -1743,7 +1739,7 @@ async function saveProfileChanges() {
         const data = await res.json();
 
         if (data.success) {
-            alert('Профиль успешно обновлён!');
+            alert('Profile updated successfully!');
 
             if (newName) {
                 currentUserName = newName;
@@ -1770,11 +1766,11 @@ async function saveProfileChanges() {
             renderAccount();        // обновляем экран профиля
 
         } else {
-            alert('Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+            alert('Error: ' + (data.error || 'Unknown error'));
         }
     } catch (e) {
         console.error(e);
-        alert('Ошибка соединения с сервером');
+        alert('Server connection error');
     }
 }
 // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ОТЗЫВА ===
@@ -1838,7 +1834,7 @@ function initStarRating() {
 // Отправка отзыва
 async function submitFeedback() {
     if (currentRating === 0) {
-        alert('Пожалуйста, поставьте оценку от 1 до 5');
+        alert('Please select a rating from 1 to 5');
         return;
     }
 
@@ -1846,7 +1842,7 @@ async function submitFeedback() {
     const user = getUser();
 
     if (!user || !user.email) {
-        alert('Вы должны быть авторизованы');
+        alert('You must be logged in');
         return;
     }
 
@@ -1864,17 +1860,17 @@ async function submitFeedback() {
         const data = await res.json();
 
         if (data.success) {
-            alert('Спасибо за ваш отзыв! ❤️');
-            closeFeedbackModal();
-        } else {
-            alert('Ошибка: ' + (data.error || 'Не удалось отправить отзыв'));
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Ошибка соединения с сервером');
+    alert('Thank you for your feedback! ❤️');
+    closeFeedbackModal();
+} else {
+    alert('Error: ' + (data.error || 'Failed to submit feedback'));
+}
+} catch (e) {
+    console.error(e);
+    alert('Server connection error');
     }
 }
-// ===== КОНСУЛЬТАЦИЯ =====
+// ===== CONSULTATION =====
 async function handleBookConsultation(e) {
   e.preventDefault();
 
@@ -1883,7 +1879,7 @@ async function handleBookConsultation(e) {
   const user = getUser();
 
   if (!user) {
-    statusEl.innerHTML = '<span class="text-red-500">Сначала войдите в аккаунт</span>';
+    statusEl.innerHTML = '<span class="text-red-500">Please log in first</span>';
     return false;
   }
 
@@ -1893,7 +1889,7 @@ async function handleBookConsultation(e) {
 
   statusEl.innerHTML = '';
   btn.disabled = true;
-  btn.innerHTML = 'Отправляем...';
+  btn.innerHTML = 'Sending...';
 
   try {
     const response = await fetch(`${SERVER_URL}/api/book-consultation`, {
@@ -1914,23 +1910,23 @@ async function handleBookConsultation(e) {
 
     if (data.success) {
       statusEl.innerHTML = `<span class="text-green-600 font-medium">${data.message}</span>`;
-      // очищаем форму
+      // reset the form
       document.getElementById('consultation-form').reset();
-      // обновляем историю в профиле
+      // update history in profile
       setTimeout(() => renderAccount(), 1500);
     } else {
       statusEl.innerHTML = `<span class="text-red-500">${data.error}</span>`;
     }
   } catch (err) {
-    statusEl.innerHTML = `<span class="text-red-500">Не удалось подключиться к серверу</span>`;
+    statusEl.innerHTML = `<span class="text-red-500">Failed to connect to the server</span>`;
   }
 
   btn.disabled = false;
-  btn.innerHTML = 'Записаться на консультацию';
+  btn.innerHTML = 'Book Consultation';
   return false;
 }
 
-// Заполняем слоты (ближайшие 14 дней, удобное время)
+// Fill slots (next 14 days, convenient times)
 function generateConsultationSlots() {
   const select = document.getElementById('consult-date');
   if (!select) return;
@@ -1942,12 +1938,12 @@ function generateConsultationSlots() {
     const date = new Date(now);
     date.setDate(date.getDate() + i);
 
-    // только будни
+    // weekdays only
     if (date.getDay() === 0 || date.getDay() === 6) continue;
 
-    const dayStr = date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+    const dayStr = date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
 
-    // удобные часы 10:00, 12:00, 14:00, 16:00, 18:00
+    // convenient hours 10:00, 12:00, 14:00, 16:00, 18:00
     [10,12,14,16,18].forEach(hour => {
       const slot = new Date(date);
       slot.setHours(hour, 0, 0, 0);
@@ -1958,15 +1954,15 @@ function generateConsultationSlots() {
     });
   }
 
-  select.innerHTML = `<option value="">Выберите удобное время...</option>` +
+  select.innerHTML = `<option value="">Select a convenient time...</option>` +
     options.map(o => `<option value="${o.value}">${o.text}</option>`).join('');
 }
 
-// generateConsultationSlots вызывается напрямую из showScreen
+// generateConsultationSlots is called directly from showScreen
 
-// ====================== ОТМЕНА КОНСУЛЬТАЦИИ ======================
+// ====================== CANCEL CONSULTATION ======================
 async function cancelConsultation(id) {
-    if (!confirm('Вы уверены, что хотите отменить эту консультацию?')) return;
+    if (!confirm('Are you sure you want to cancel this consultation?')) return;
 
     const user = getUser();
     if (!user) return;
@@ -1986,29 +1982,29 @@ async function cancelConsultation(id) {
         if (data.success) {
             await loadConsultationHistory();
         } else {
-            alert(data.error || 'Не удалось отменить консультацию');
+            alert(data.error || 'Failed to cancel consultation');
         }
     } catch (err) {
-        alert('Не удалось подключиться к серверу');
+        alert('Failed to connect to the server');
         console.error(err);
     }
 }
 let gratitudeList = [];
 
-// Показать экран сада
+// Show garden screen
 function showGarden() {
     showScreen('garden');
     resetGarden();
 }
 
-// Сброс игры
+// Reset game
 function resetGarden() {
     gratitudeList = [];
     document.getElementById('garden-stage-1').classList.remove('hidden');
     document.getElementById('garden-stage-2').classList.add('hidden');
     document.getElementById('garden-stage-3').classList.add('hidden');
 
-    // Создаём 5 полей ввода
+    // Create 5 input fields
     const container = document.getElementById('gratitude-inputs');
     container.innerHTML = '';
     for (let i = 1; i <= 5; i++) {
@@ -2018,13 +2014,13 @@ function resetGarden() {
             <div class="w-8 h-8 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold flex-shrink-0">${i}</div>
             <input type="text" id="gratitude-${i}" 
                    class="flex-1 px-5 py-4 rounded-3xl border border-purple-100 focus:border-purple-400 outline-none" 
-                   placeholder="Например: тёплое солнце утром...">
+                   placeholder="For example: warm morning sun...">
         `;
         container.appendChild(div);
     }
 }
 
-// Посадить семена
+// Plant seeds
 function plantSeeds() {
     gratitudeList = [];
     for (let i = 1; i <= 5; i++) {
@@ -2033,7 +2029,7 @@ function plantSeeds() {
     }
 
     if (gratitudeList.length === 0) {
-        alert("Напиши хотя бы одну вещь, за которую ты благодарен ❤️");
+        alert("Write at least one thing you are grateful for ❤️");
         return;
     }
 
@@ -2043,7 +2039,7 @@ function plantSeeds() {
     growGarden();
 }
 
-// Анимация роста
+// Growth animation
 function growGarden() {
     const canvas = document.getElementById('garden-canvas');
     const ctx = canvas.getContext('2d');
@@ -2063,7 +2059,6 @@ function growGarden() {
         }
     }, 30);
 }
-
 // Рисование растущего сада
 function drawGrowingGarden(ctx, progress) {
     ctx.clearRect(0, 0, 700, 420);
@@ -2175,22 +2170,22 @@ function restartGarden() {
 const miniGames = [
   {
     id: "garden",
-    title: "Сад Благодарности",
-    description: "Посади 3–5 вещей, за которые ты благодарен сегодня и наблюдай, как растёт твой сад",
+    title: "Gratitude Garden",
+    description: "Plant 3–5 things you are grateful for today and watch your garden grow",
     icon: "🌸",
     color: "from-amber-400 to-pink-500"
   },
   {
     id: "breathing",
-    title: "Круг Спокойствия",
-    description: "Техника 4-7-8 дыхания для мгновенного успокоения",
+    title: "Circle of Calm",
+    description: "4-7-8 breathing technique for instant relaxation",
     icon: "🌬️",
     color: "from-purple-400 to-indigo-500"
   },
   {
     id: "bubbles",
-    title: "Пузыри Стресса",
-    description: "Лопай негативные мысли и превращай их в позитив",
+    title: "Stress Bubbles",
+    description: "Pop negative thoughts and turn them into positivity",
     icon: "🫧",
     color: "from-pink-400 to-rose-500"
   }
@@ -2207,7 +2202,7 @@ function renderGamesCatalog() {
       <h3 class="font-bold text-xl mb-2 group-hover:text-purple-600 transition-colors">${game.title}</h3>
       <p class="text-sm text-gray-500 leading-relaxed">${game.description}</p>
       <div class="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-purple-500">
-        ИГРАТЬ →
+        PLAY →
       </div>
     </div>
   `).join("");
@@ -2231,8 +2226,8 @@ function resetBreathing() {
   clearInterval(breathingInterval);
   isBreathing = false;
   document.getElementById('breathing-complete').classList.add('hidden');
-  document.getElementById('start-breathing-btn').textContent = 'Начать дыхание';
-  document.getElementById('breathing-instruction').textContent = 'Готовы?';
+  document.getElementById('start-breathing-btn').textContent = 'Start Breathing';
+  document.getElementById('breathing-instruction').textContent = 'Ready?';
   document.getElementById('breathing-count').textContent = '';
   document.getElementById('breathing-circle').style.transform = 'scale(1)';
   document.getElementById('breathing-circle').style.borderColor = '#c4b5fd';
@@ -2246,44 +2241,44 @@ function startBreathing() {
   const instruction = document.getElementById('breathing-instruction');
   const countEl = document.getElementById('breathing-count');
 
-  document.getElementById('start-breathing-btn').textContent = 'Дышим...';
+  document.getElementById('start-breathing-btn').textContent = 'Breathing...';
 
-  let phase = 0; // 0 = вдох, 1 = задержка, 2 = выдох, 3 = задержка
+  let phase = 0; // 0 = inhale, 1 = hold, 2 = exhale, 3 = hold
 
   function nextPhase() {
     phase = (phase + 1) % 4;
 
-    if (phase === 0) { // ВДОХ — 4 секунды
-      instruction.textContent = "Вдох...";
+    if (phase === 0) { // INHALE — 4 seconds
+      instruction.textContent = "Inhale...";
       countEl.textContent = "4";
       circle.style.transform = "scale(1.4)";
       circle.style.borderColor = "#a855f7";
       setTimeout(nextPhase, 4000);
     } 
-    else if (phase === 1) { // ЗАДЕРЖКА — 7 секунд
-      instruction.textContent = "Задержи дыхание";
+    else if (phase === 1) { // HOLD — 7 seconds
+      instruction.textContent = "Hold breath";
       countEl.textContent = "7";
       setTimeout(nextPhase, 7000);
     } 
-    else if (phase === 2) { // ВЫДОХ — 8 секунд
-      instruction.textContent = "Медленный выдох...";
+    else if (phase === 2) { // EXHALE — 8 seconds
+      instruction.textContent = "Slow exhale...";
       countEl.textContent = "8";
       circle.style.transform = "scale(0.85)";
       circle.style.borderColor = "#6366f1";
       setTimeout(nextPhase, 8000);
     } 
-    else if (phase === 3) { // Короткая задержка — 4 секунды
-      instruction.textContent = "Задержи";
+    else if (phase === 3) { // Short hold — 4 seconds
+      instruction.textContent = "Hold";
       countEl.textContent = "4";
       setTimeout(nextPhase, 4000);
     }
   }
 
-  nextPhase(); // запускаем первый цикл
+  nextPhase(); // launch first cycle
 }
 
 function exitBreathing() {
-  clearInterval(breathingInterval); // на всякий случай
+  clearInterval(breathingInterval); // just in case
   showScreen('games');
 }
 
@@ -2291,7 +2286,8 @@ function restartBreathing() {
   resetBreathing();
   setTimeout(startBreathing, 300);
 }
-// ====================== ПУЗЫРИ СТРЕССА (исправленная версия) ======================
+
+// ====================== STRESS BUBBLES (fixed version) ======================
 let bubbles = [];
 let poppedCount = 0;
 let bubblesInterval = null;
@@ -2299,9 +2295,9 @@ let isBubblesPlaying = false;
 let bubblesCanvasListener = null;
 
 const negativeThoughts = [
-  "Я неудачник", "Всё плохо", "Я не справлюсь", "Меня никто не любит",
-  "Я устал", "Ничего не получится", "Я слишком слаб", "Это конец",
-  "Я боюсь", "Мне стыдно", "Я не достоин"
+  "I am a failure", "Everything is bad", "I can't handle this", "Nobody loves me",
+  "I am tired", "Nothing will work out", "I am too weak", "This is the end",
+  "I am scared", "I am ashamed", "I am not worthy"
 ];
 
 function showBubbles() {
@@ -2321,14 +2317,14 @@ function resetBubbles() {
   isBubblesPlaying = false;
 
   document.getElementById('bubbles-complete').classList.add('hidden');
-  document.getElementById('start-bubbles-btn').textContent = 'Начать сеанс';
+  document.getElementById('start-bubbles-btn').textContent = 'Start Session';
   document.getElementById('bubbles-popped').textContent = '0';
 }
 
 function startBubblesGame() {
   resetBubbles();
   isBubblesPlaying = true;
-  document.getElementById('start-bubbles-btn').textContent = 'Игра идёт...';
+  document.getElementById('start-bubbles-btn').textContent = 'Game in progress...';
 
   const canvas = document.getElementById('bubbles-canvas');
   const ctx = canvas.getContext('2d');
@@ -2340,13 +2336,13 @@ function startBubblesGame() {
       y: 60 + Math.random() * 280,
       radius: 26 + Math.random() * 18,
       vx: (Math.random() - 0.5) * 2.8,
-      vy: (Math.random() - 0.5) * 2.2 - 1.2,   // ← медленнее
+      vy: (Math.random() - 0.5) * 2.2 - 1.2,   // ← slower
       text: negativeThoughts[Math.floor(Math.random() * negativeThoughts.length)],
       popped: false
     });
   }
 
-  // Новый слушатель кликов
+  // New click listener
   bubblesCanvasListener = function(e) {
     if (!isBubblesPlaying) return;
 
@@ -2387,16 +2383,16 @@ function updateBubbles(ctx) {
     if (bubble.popped) return;
     remaining++;
 
-    // Движение (сделали медленнее)
+    // Movement (made slower)
     bubble.x += bubble.vx;
     bubble.y += bubble.vy;
-    bubble.vy += 0.008;        // ← уменьшил гравитацию
+    bubble.vy += 0.008;        // ← reduced gravity
 
-    // Отскоки
+    // Bounces
     if (bubble.x - bubble.radius < 30 || bubble.x + bubble.radius > 670) bubble.vx *= -0.92;
     if (bubble.y - bubble.radius < 40) bubble.vy *= -0.88;
 
-    // Рисуем пузырь
+    // Draw bubble
     ctx.save();
     ctx.shadowColor = "#c4b5fd";
     ctx.shadowBlur = 18;
@@ -2409,7 +2405,7 @@ function updateBubbles(ctx) {
     ctx.stroke();
     ctx.restore();
 
-    // Текст
+    // Text
     ctx.fillStyle = "#4c1d95";
     ctx.font = "600 13.5px Outfit";
     ctx.textAlign = "center";
@@ -2441,6 +2437,7 @@ function restartBubbles() {
   resetBubbles();
   setTimeout(startBubblesGame, 180);
 }
+
 // ====================== PREMIUM ======================
 function showPremiumScreen() {
   showScreen('premium');
@@ -2459,14 +2456,14 @@ function closePaymentModal() {
 async function processPayment() {
   const user = getUser();
   if (!user) {
-    alert("Сначала войдите в аккаунт");
+    alert("Please log in to your account first");
     return;
   }
 
-  // Симуляция оплаты
+  // Payment simulation
   const cardNumber = document.getElementById('card-number').value.trim();
   if (!cardNumber) {
-    alert("Введите номер карты");
+    alert("Please enter a card number");
     return;
   }
 
@@ -2487,21 +2484,22 @@ async function processPayment() {
     const data = await res.json();
 
     if (data.success) {
-      alert("🎉 Поздравляем! Подписка Premium активирована на 30 дней!");
+      alert("🎉 Congratulations! Premium subscription activated for 30 days!");
       closePaymentModal();
       showScreen('dashboard');
     } else {
-      alert("Ошибка: " + (data.error || "Не удалось активировать подписку"));
+      alert("Error: " + (data.error || "Failed to activate subscription"));
     }
   } catch (e) {
-    alert("✅ В демо-режиме подписка активирована!");
+    alert("✅ Subscription activated in demo mode!");
     closePaymentModal();
     showScreen('dashboard');
   }
 }
-// ====================== PREMIUM ОГРАНИЧЕНИЯ ======================
 
-// Проверка статуса Premium
+// ====================== PREMIUM LIMITATIONS ======================
+
+// Check Premium status
 async function isUserPremium() {
   const user = getUser();
   if (!user || !user.email) return false;
@@ -2513,12 +2511,12 @@ async function isUserPremium() {
     const data = await res.json();
     return data.success && data.isPremium;
   } catch (e) {
-    // fallback на localStorage для демо
+    // fallback to localStorage for demo
     return localStorage.getItem(`premium_${user.email}`) === 'true';
   }
 }
 
-// Проверка доступа к функции
+// Check feature access
 async function checkPremiumAccess(feature) {
   const isPremium = await isUserPremium();
   if (isPremium) return true;
@@ -2527,32 +2525,32 @@ async function checkPremiumAccess(feature) {
 
   switch(feature) {
     case "test":
-      message = "Вы уже прошли 3 теста на этой неделе.\n\nПремиум даёт неограниченное количество тестов!";
+      message = "You have already completed 3 tests this week.\n\nPremium grants an unlimited number of tests!";
       break;
     case "ai":
-      message = "Лимит сообщений MindMirror AI исчерпан на сегодня.\n\nВ Premium — безлимитный AI";
+      message = "MindMirror AI message limit reached for today.\n\nPremium includes unlimited AI";
       break;
     case "game":
-      message = "Вы уже использовали лимит игр на сегодня.\n\nВ Premium — неограниченный доступ ко всем играм";
+      message = "You have already reached your game limit for today.\n\nPremium gives unlimited access to all games";
       break;
     default:
-      message = "Эта функция доступна только в Premium";
+      message = "This feature is only available in Premium";
   }
 
-  if (confirm(message + "\n\nПерейти к Premium?")) {
+  if (confirm(message + "\n\nUpgrade to Premium?")) {
     showScreen('premium');
   }
   return false;
 }
 
-// ====================== ОГРАНИЧЕНИЯ ТЕСТОВ ======================
+// ====================== TEST LIMITATIONS ======================
 let weeklyTestsCount = 0;
 
 async function canStartTest() {
   const isPremium = await isUserPremium();
   if (isPremium) return true;
 
-  // Простой счётчик на неделю (в localStorage)
+  // Simple weekly counter (in localStorage)
   const today = new Date().toISOString().slice(0,10);
   const saved = JSON.parse(localStorage.getItem('weeklyTests') || '{}');
   
@@ -2571,7 +2569,7 @@ async function canStartTest() {
   return true;
 }
 
-// Перехватываем запуск теста
+// Intercept test start
 const originalStartTest = window.startTest || function(){};
 window.startTest = async function(testId) {
   if (await canStartTest()) {
@@ -2579,9 +2577,7 @@ window.startTest = async function(testId) {
   }
 };
 
-
-
-// ====================== ОГРАНИЧЕНИЯ МИНИ-ИГР ======================
+// ====================== MINI-GAME LIMITATIONS ======================
 const gameDailyLimit = 2;
 const gameUsage = {};
 
@@ -2599,22 +2595,21 @@ async function startMiniGame(id) {
     gameUsage[today][id]++;
   }
 
-  // Запускаем игру
+  // Start game
   if (id === "garden") showGarden();
   else if (id === "breathing") showBreathing();
   else if (id === "bubbles") showBubbles();
 }
 
-
-// ====================== ОТМЕНА ПОДПИСКИ ======================
+// ====================== CANCEL SUBSCRIPTION ======================
 async function cancelSubscription() {
   const user = getUser();
   if (!user) {
-    alert("Вы не авторизованы");
+    alert("You are not logged in");
     return;
   }
 
-  if (!confirm("Вы уверены, что хотите отменить Premium-подписку?\n\nПодписка будет активна до конца оплаченного периода.")) {
+  if (!confirm("Are you sure you want to cancel your Premium subscription?\n\nThe subscription will remain active until the end of the paid period.")) {
     return;
   }
 
@@ -2631,31 +2626,31 @@ async function cancelSubscription() {
     const data = await res.json();
 
     if (data.success) {
-      alert("✅ Подписка успешно отменена.\n\nВы сможете пользоваться Premium до конца оплаченного периода.");
-      showScreen('premium'); // обновляем экран
+      alert("✅ Subscription successfully cancelled.\n\nYou can continue using Premium until the end of the paid period.");
+      showScreen('premium'); // update screen
     } else {
-      alert("Ошибка: " + (data.error || "Не удалось отменить подписку"));
+      alert("Error: " + (data.error || "Failed to cancel subscription"));
     }
   } catch (e) {
-    alert("❌ Ошибка соединения с сервером");
+    alert("❌ Server connection error");
     console.error(e);
   }
 };
-// ====================== ТЕХПОДДЕРЖКА ======================
+
+// ====================== TECH SUPPORT / CONSULTATION ======================
 async function handleBookConsultation(e) {
   e.preventDefault();
   const user = getUser();
-  if (!user) return alert("Войдите в аккаунт");
+  if (!user) return alert("Please log in to your account");
 
   const topic = document.getElementById('consult-topic').value;
   const preferredDate = document.getElementById('consult-date').value;
   const notes = document.getElementById('consult-notes').value.trim();
 
   if (!topic || !preferredDate) {
-    alert("Выберите тему и дату/время");
+    alert("Please select a topic and date/time");
     return;
   }
-
   try {
     const res = await fetch(`${SERVER_URL}/api/book-consultation`, {
       method: 'POST',
@@ -2666,14 +2661,14 @@ async function handleBookConsultation(e) {
     const data = await res.json();
 
     if (data.success) {
-      alert(data.message || "Заявка отправлена! Психолог свяжется с вами ❤️");
+      alert(data.message || "Request sent! A psychologist will contact you ❤️");
       e.target.reset();
       loadConsultationHistory();
     } else {
-      alert("Ошибка: " + (data.error || "Не удалось записаться"));
+      alert("Error: " + (data.error || "Failed to book consultation"));
     }
   } catch (err) {
-    alert("Ошибка соединения с сервером");
+    alert("Server connection error");
   }
 }
 
@@ -2688,13 +2683,13 @@ async function loadConsultationHistory() {
     const data = await res.json();
 
     if (!data.success || data.consultations.length === 0) {
-      container.innerHTML = `<p class="text-gray-500 text-center py-12">У вас пока нет записей на консультации</p>`;
+      container.innerHTML = `<p class="text-gray-500 text-center py-12">You have no consultation bookings yet</p>`;
       return;
     }
 
     let html = '';
     data.consultations.forEach(c => {
-      const dateStr = new Date(c.PreferredDate).toLocaleString('ru-RU');
+      const dateStr = new Date(c.PreferredDate).toLocaleString('en-US');
       html += `
         <div class="glass p-6 rounded-3xl flex justify-between items-start">
           <div>
@@ -2704,20 +2699,20 @@ async function loadConsultationHistory() {
           </div>
           <div class="text-right">
             <span class="px-3 py-1 text-xs rounded-2xl ${c.Status === 'cancelled' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}">
-              ${c.Status === 'cancelled' ? 'Отменена' : 'Ожидает'}
+              ${c.Status === 'cancelled' ? 'Cancelled' : 'Pending'}
             </span>
-            ${c.Status !== 'cancelled' ? `<button onclick="cancelConsultation(${c.Id})" class="text-red-500 text-xs mt-3 block">Отменить</button>` : ''}
+            ${c.Status !== 'cancelled' ? `<button onclick="cancelConsultation(${c.Id})" class="text-red-500 text-xs mt-3 block">Cancel</button>` : ''}
           </div>
         </div>`;
     });
     container.innerHTML = html;
   } catch (e) {
-    container.innerHTML = `<p class="text-red-500">Не удалось загрузить историю</p>`;
+    container.innerHTML = `<p class="text-red-500">Failed to load history</p>`;
   }
 }
 
 async function cancelConsultation(id) {
-  if (!confirm("Отменить эту консультацию?")) return;
+  if (!confirm("Cancel this consultation?")) return;
   const user = getUser();
   if (!user) return;
 
@@ -2729,19 +2724,19 @@ async function cancelConsultation(id) {
     });
     const data = await res.json();
     if (data.success) {
-      alert("Консультация отменена");
+      alert("Consultation cancelled");
       loadConsultationHistory();
     } else {
-      alert(data.error || "Не удалось отменить");
+      alert(data.error || "Failed to cancel");
     }
   } catch (err) {
-    alert("Ошибка соединения");
+    alert("Connection error");
   }
 }
 
-// ====================== ЕДИНСТВЕННАЯ showScreen ======================
+// ====================== SINGLE showScreen ======================
 function showScreen(id) {
-    console.log('→ Открываем экран:', id);
+    console.log('→ Opening screen:', id);
 
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     const screen = document.getElementById("screen-" + id);
@@ -2749,17 +2744,17 @@ function showScreen(id) {
     if (screen) {
         screen.classList.add("active");
     } else {
-        console.error("Экран не найден:", id);
+        console.error("Screen not found:", id);
         return;
     }
 
-    // Подсветка меню
+    // Menu highlight
     document.querySelectorAll(".nav-btn").forEach(btn => {
         btn.classList.remove("active");
         if (btn.id === "nav-" + id) btn.classList.add("active");
     });
 
-    // Действия при открытии экранов
+    // Actions when opening screens
     if (id === "dashboard") renderDashboard();
     if (id === "tests") renderTestCatalog();
     if (id === "account") renderAccount();
@@ -2779,9 +2774,9 @@ function showScreen(id) {
     }
 }
 
-// ====================== ИНИЦИАЛИЗАЦИЯ ======================
+// ====================== INITIALIZATION ======================
 window.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ MindMirror загружен");
+    console.log("✅ MindMirror loaded");
     const user = getUser();
     if (user && user.email) {
         enterApp();
@@ -2793,7 +2788,8 @@ window.addEventListener("DOMContentLoaded", () => {
     initStarRating();
     renderGamesCatalog();
 });
-// ====================== MINDMIRROR AI — РАБОЧАЯ ВЕРСИЯ ======================
+
+// ====================== MINDMIRROR AI — WORKING VERSION ======================
 let aiHistory = [];
 
 function renderAIChat() {
@@ -2812,11 +2808,11 @@ async function sendAIMessage() {
   const messagesContainer = document.getElementById('ai-messages');
   const welcome = document.getElementById('ai-welcome');
 
-  // Прячем приветствие, показываем чат
+  // Hide welcome, show chat
   if (welcome) welcome.style.display = 'none';
   if (messagesContainer) messagesContainer.classList.remove('hidden');
 
-  // Сообщение пользователя
+  // User message
   messagesContainer.innerHTML += `
     <div class="flex justify-end mb-6">
       <div class="max-w-[70%] bg-purple-600 text-white px-6 py-4 rounded-3xl rounded-tr-none">
@@ -2829,12 +2825,12 @@ async function sendAIMessage() {
   input.value = '';
   aiHistory.push({ role: 'user', content: userMessage });
 
-  // "Думает..."
+  // "Thinking..."
   const loadingId = 'loading-' + Date.now();
   messagesContainer.innerHTML += `
     <div id="${loadingId}" class="flex gap-4 mb-6">
       <div class="text-4xl">🪞</div>
-      <div class="bg-white px-6 py-4 rounded-3xl rounded-tl-none">думает...</div>
+      <div class="bg-white px-6 py-4 rounded-3xl rounded-tl-none">thinking...</div>
     </div>`;
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
@@ -2853,7 +2849,7 @@ async function sendAIMessage() {
       <div class="flex gap-4 mb-6">
         <div class="text-4xl flex-shrink-0">🪞</div>
         <div class="max-w-[75%] bg-white px-6 py-4 rounded-3xl rounded-tl-none leading-relaxed whitespace-pre-wrap">
-          ${data.response || 'Я не смог ответить сейчас...'}
+          ${data.response || 'I could not answer right now...'}
         </div>
       </div>`;
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -2864,7 +2860,7 @@ async function sendAIMessage() {
     console.error(err);
     const loadingEl = document.getElementById(loadingId);
     if (loadingEl) loadingEl.remove();
-    messagesContainer.innerHTML += `<div class="text-red-500 px-4">❌ Не удалось подключиться к ИИ. Убедись, что server.js запущен.</div>`;
+    messagesContainer.innerHTML += `<div class="text-red-500 px-4">❌ Failed to connect to AI. Make sure server.js is running.</div>`;
   }
 }
 
@@ -2875,7 +2871,8 @@ function quickAIMessage(text) {
     sendAIMessage();
   }
 }
-// ====================== МОБИЛЬНОЕ МЕНЮ ======================
+
+// ====================== MOBILE MENU ======================
 let sidebarOpen = false;
 
 function toggleSidebar() {
@@ -2895,46 +2892,47 @@ function toggleSidebar() {
   }
 }
 
-// Закрывать меню при переходе на другой экран (на мобильных)
+// Close menu when navigating to another screen (on mobile)
 const originalShowScreen = window.showScreen || showScreen;
 window.showScreen = function(id) {
   originalShowScreen(id);
   if (window.innerWidth < 768) {  // md breakpoint
-    toggleSidebar(); // закрываем меню после выбора
+    toggleSidebar(); // close menu after selection
   }
 };
 
-// Инициализация гамбургера
+// Hamburger initialization
 window.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById('hamburger-btn');
   if (hamburger) {
     hamburger.addEventListener('click', toggleSidebar);
   }
   
-  // Закрывать при нажатии Esc
+  // Close on Esc key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && sidebarOpen) toggleSidebar();
   });
 });
 </script>
-<!-- МОДАЛЬНОЕ ОКНО ОПЛАТЫ PREMIUM -->
+
+<!-- PREMIUM PAYMENT MODAL -->
 <div id="modal-payment" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[100]">
   <div class="glass max-w-md w-full mx-4 p-8 rounded-3xl">
-    <h2 class="text-2xl font-bold mb-6 text-center">Оформление Premium</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center">Premium Checkout</h2>
     
     <div class="bg-white/70 p-6 rounded-2xl mb-6">
-      <p class="text-center text-lg font-medium">990 ₸ / месяц</p>
+      <p class="text-center text-lg font-medium">990 ₸ / month</p>
     </div>
 
     <div class="space-y-5">
       <div>
-        <label class="block text-sm font-medium mb-2">Номер карты</label>
+        <label class="block text-sm font-medium mb-2">Card Number</label>
         <input id="card-number" type="text" maxlength="19" placeholder="4242 4242 4242 4242" 
                class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-purple-500 outline-none text-lg">
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium mb-2">Срок действия</label>
+          <label class="block text-sm font-medium mb-2">Expiration Date</label>
           <input id="card-expiry" type="text" maxlength="5" placeholder="12/28" 
                  class="w-full px-5 py-4 rounded-2xl border border-gray-300 focus:border-purple-500 outline-none">
         </div>
@@ -2948,13 +2946,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     <div class="flex gap-3 mt-8">
       <button onclick="closePaymentModal()" 
-              class="flex-1 py-4 rounded-2xl border border-gray-300 hover:bg-gray-100">Отмена</button>
+              class="flex-1 py-4 rounded-2xl border border-gray-300 hover:bg-gray-100">Cancel</button>
       <button onclick="processPayment()" 
               class="flex-1 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold">
-        Оплатить 990 ₸
+        Pay 990 ₸
       </button>
     </div>
-    <p class="text-center text-xs text-gray-500 mt-6">Данные карты защищены • Тестовый режим</p>
+    <p class="text-center text-xs text-gray-500 mt-6">Card data is secure • Test Mode</p>
   </div>
 </div>
 
